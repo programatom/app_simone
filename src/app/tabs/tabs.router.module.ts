@@ -8,42 +8,63 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
+        path: 'info-pedido',
+        loadChildren: '../info-pedido/info-pedido.module#InfoPedidoPageModule'
+      },
+      {
+        path: 'modificar-pedido',
+        loadChildren: '../modificar-pedido/modificar-pedido.module#ModificarPedidoPageModule'
+      },
+      {
+        path: 'entregas-habituales-hoy',
         children: [
           {
             path: '',
-            loadChildren: '../tab1/tab1.module#Tab1PageModule'
+            loadChildren: '../entregas-habituales-hoy/entregas-habituales-hoy.module#EntregasHabitualesHoyPageModule'
           }
         ]
       },
       {
-        path: 'tab2',
+        path: 'mis-pedidos',
         children: [
           {
             path: '',
-            loadChildren: '../tab2/tab2.module#Tab2PageModule'
+            loadChildren: '../mis-pedidos/mis-pedidos.module#MisPedidosPageModule'
+          },
+          {
+            path: 'pedidos-visualizer',
+            loadChildren: '../mis-pedidos/pedido-visualizer/pedido-visualizer.module#PedidoVisualizerPageModule'
           }
         ]
       },
       {
-        path: 'tab3',
+        path: 'entregas-procesadas',
         children: [
           {
             path: '',
-            loadChildren: '../tab3/tab3.module#Tab3PageModule'
+            loadChildren: '../entregas-procesadas/entregas-procesadas.module#EntregasProcesadasPageModule'
+          }
+        ]
+      },
+      {
+        path: 'alarma-derivadas',
+        children: [
+          {
+            path: '',
+            loadChildren: '../alarma-derivadas/alarma-derivadas.module#AlarmaDerivadasPageModule'
           }
         ]
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/tabs/entregas-habituales-hoy',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
+    redirectTo: '/tabs/entregas-habituales-hoy',
     pathMatch: 'full'
   }
 ];

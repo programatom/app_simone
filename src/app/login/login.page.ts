@@ -33,10 +33,10 @@ export class LoginPage implements OnInit {
                 }
                 let token = respuesta.data.api_token;
                 let nombre = respuesta.data.name;
-                this.localStorageServ.insertAndInstantiateValue("token", token).then(() => {
+                this.localStorageServ.insertAndInstantiateValue("token", token).then((respuesta) => {
+                    console.log(respuesta);
                     this.toastServ.presentToast("Bienvenido " + nombre, "success");
                     this.navCtrl.navigateForward("");
-
                 });
             } else {
                 var mensajeError = "El email o la contraseña son incorrectos";

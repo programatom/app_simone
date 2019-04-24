@@ -3,20 +3,21 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from "rxjs/operators"
 import { Observable } from 'rxjs';
 import { ObjRespuestaServidor } from 'src/interfaces/interfaces';
+import { LocalStorageService } from './local-storage/local-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpService {
-
-  constructor(private http: HttpClient) {
-
+  token:string;
+  constructor(private http: HttpClient,
+              private localStorageServ: LocalStorageService) {
   }
-  httpGet(url: string, token:string): Observable<ObjRespuestaServidor> {
-
+  httpGet(url: string): Observable<ObjRespuestaServidor> {
+    this.token = this.localStorageServ.localStorageObj.token;
     const headerDict = {
       'Accept': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Bearer ' + this.token,
     }
 
     const requestOptions = {
@@ -31,11 +32,11 @@ export class HttpService {
       );
   }
 
-  httpPost(url: string, data:any ,token?:string, content_type?:string): Observable<ObjRespuestaServidor> {
-
+  httpPost(url: string, data:any, content_type?:string): Observable<ObjRespuestaServidor> {
+    this.token = this.localStorageServ.localStorageObj.token;
     var headerDict;
 
-    if(token == undefined){
+    if(this.token == undefined){
       headerDict = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -44,7 +45,7 @@ export class HttpService {
       headerDict = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ' + token,
+        'Authorization': 'Bearer ' + this.token,
       }
     }
 
@@ -61,11 +62,11 @@ export class HttpService {
       );
   }
 
-  httpPut(url: string, data:any ,token?:string, content_type?:string): Observable<ObjRespuestaServidor> {
-
+  httpPut(url: string, data:any, content_type?:string): Observable<ObjRespuestaServidor> {
+    this.token = this.localStorageServ.localStorageObj.token;
     var headerDict;
 
-    if(token == undefined){
+    if(this.token == undefined){
       headerDict = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -74,13 +75,13 @@ export class HttpService {
       headerDict = {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ' + token,
+        'Authorization': 'Bearer ' + this.token,
       }
     }else{
       headerDict = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ' + token,
+        'Authorization': 'Bearer ' + this.token,
       }
 
     }
