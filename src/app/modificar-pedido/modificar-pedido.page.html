@@ -1,0 +1,110 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title *ngIf="entregasLogic.isScheduled">Entrega Nº {{entrega.entrega.id}}</ion-title>
+        <ion-title *ngIf="!entregasLogic.isScheduled">Entrega Nueva</ion-title>
+
+        <ion-buttons slot="start">
+            <ion-button (click)="dismiss()">
+                <ion-icon name="arrow-back" style="font-size:7vw">
+                </ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+
+</ion-header>
+
+<ion-content>
+
+    <ion-row>
+
+        <ion-col size="12" text-center *ngIf="entregasLogic.isScheduled">
+          <ion-text color ="tertiary" style="font-size:6vw">
+            <strong>Estado: </strong>
+          {{entrega.entrega.estado}}
+        </ion-text>
+        </ion-col>
+        <ion-col size="12">
+            <ion-item>
+                <ion-textarea [(ngModel)]="observaciones" placeholder="Ingrese la información de la entrega.."></ion-textarea>
+            </ion-item>
+        </ion-col>
+        <div *ngIf="entregasLogic.isScheduled" style="width:100%">
+          <ion-col size="12">
+            <ion-button expand="full" color="danger" (click)="cancelar()" [disabled]="entrega.entrega.estado == 'cancelada'">
+              Cancelar
+            </ion-button>
+          </ion-col>
+          <ion-col size="12" *ngIf="entrega.entrega.estado == 'sin procesar'">
+            <ion-button expand="full" color="tertiary" (click)="derivar()">
+              Derivar a {{entrega.pedido.repartidor_excepcional}}
+            </ion-button>
+          </ion-col>
+        </div>
+
+        <ion-item color="primary" lines="none" text-wrap *ngFor="let producto of productos; let i = index">
+            <ion-buttons slot="end">
+                <ion-icon style="font-size: 8vw" name="close-circle" (click)="eliminar(i)" color="light" item-end>
+                </ion-icon>
+                <ion-icon style="font-size: 8vw" name="add-circle" (click)="agregar(i)" color="light" item-end>
+                </ion-icon>
+            </ion-buttons>
+            <ion-text class="text-light">
+                <strong style="font-size:6vw;"> {{producto.cantidad}} </strong> | {{producto.nombre}} <strong>$ {{producto.precio}} c/u</strong>
+            </ion-text>
+        </ion-item>
+        <ion-row>
+          <ion-col size="12">
+            <ion-item>
+              <ion-label>Productos</ion-label>
+              <ion-select interface="alert" multiple="false" placeholder="Elija un producto" (ionChange)="seleccionProducto($event)">
+                <ion-select-option [value]="producto" *ngFor="let producto of productosDeLaEmpresa">{{producto.nombre}}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+
+        <ion-col size="12">
+            <ion-item>
+                <ion-label>
+                    Monto a pagar:
+                </ion-label>
+                <ion-input [(ngModel)]="montoAPagar" type="number" readonly>
+                </ion-input>
+            </ion-item>
+        </ion-col>
+        <ion-col size="12">
+            <ion-item>
+                <ion-label>
+                    Paga con:
+                </ion-label>
+                <ion-input [(ngModel)]="pagaCon" type="number">
+                </ion-input>
+            </ion-item>
+        </ion-col>
+
+        <br>
+
+
+        <ion-col size="12" *ngIf="entregasLogic.isScheduled">
+            <ion-item>
+                <ion-label>
+                    Adelanta entregas:
+                </ion-label>
+                <ion-input [(ngModel)]="entregasAdelantadas" type="number">
+                </ion-input>
+            </ion-item>
+
+            <strong>
+                Nota:
+            </strong>
+            no se incluye la entrega actual. Si se adelanta un pedido semanal por un mes, se estarían adelantando 3 entregas, la actual se realiza a tiempo y las otras 3 del mes se adelantan.
+        </ion-col>
+
+        <ion-col size="12">
+            <ion-button expand="block" (click)="procesar()">
+                Procesar
+            </ion-button>
+        </ion-col>
+    </ion-row>
+
+</ion-content>

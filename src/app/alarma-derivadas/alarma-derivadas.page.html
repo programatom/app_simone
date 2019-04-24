@@ -1,0 +1,77 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Alarma y derivadas</ion-title>
+    </ion-toolbar>
+    <ion-searchbar placeholder="Filtrar" (ionChange)="filtrarEntregas($event)"></ion-searchbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+    <ion-list>
+        <ion-item-sliding *ngFor="let entrega of entregasDisplay; let i = index">
+            <ion-item>
+                <ion-row>
+                    <ion-col size="12" *ngIf="entrega.entrega.derivada == 1">
+                        <strong>
+                          <ion-text color="tertiary">
+                            Derivado de {{entrega.pedido.repartidor_habitual}}
+                          </ion-text>
+                        </strong>
+                    </ion-col>
+                    <ion-col size="12" *ngIf="entrega.pedido.alarma == 1">
+                        <strong>
+                          <ion-text color="tertiary">
+                            Alarma
+                          </ion-text>
+                        </strong>
+                    </ion-col>
+                    <ion-col size="12">
+                        <strong>
+                            Nombre:
+                        </strong>
+                    </ion-col>
+                    <ion-col size="6">
+                        {{entrega.usuario.name}}
+                    </ion-col>
+                    <ion-col size="6" text-center>
+                        <ion-button (click)="verInfo(entrega)">
+                            Ver info
+                        </ion-button>
+                    </ion-col>
+                    <ion-col size="12">
+                        <strong>
+                            Localidad:
+                        </strong>
+                    </ion-col>
+                    <ion-col size="12">
+                        {{entrega.rol.localidad}}
+                    </ion-col>
+                    <ion-col size="12" *ngIf="entrega.pedido.alarma == 1">
+                        <strong>
+                            Fecha de entrega pasada:
+                        </strong>
+                    </ion-col>
+                    <ion-col size="12" *ngIf="entrega.pedido.alarma == 1">
+                        {{entrega.entrega.fecha_de_entrega_potencial}}
+                    </ion-col>
+                </ion-row>
+            </ion-item>
+
+            <ion-item-options side="end">
+                <ion-item-option color="secondary" (click)="modificar(entrega)">Modificar</ion-item-option>
+                <ion-item-option color="success" (click)="entregarSinModificaciones(entrega , i)" >Entregar</ion-item-option>
+            </ion-item-options>
+        </ion-item-sliding>
+        <ion-row *ngIf="entregasDisplay.length == 20">
+          <ion-col size="12">
+            <ion-text color="tertiary">
+              Mostrando las primeras 20 entradas
+            </ion-text>
+          </ion-col>
+        </ion-row>
+    </ion-list>
+</ion-content>

@@ -1,0 +1,102 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Procesadas</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+    <ion-item>
+        <ion-label>Desde</ion-label>
+        <ion-datetime display-format="YYYY/MM/DD" cancelText="Cancelar" doneText="Elegir" (ionChange)="elegirFecha($event, 'desde')"></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+        <ion-label>Hasta</ion-label>
+        <ion-datetime display-format="YYYY/MM/DD" cancelText="Cancelar" doneText="Elegir" (ionChange)="elegirFecha($event, 'hasta')"></ion-datetime>
+    </ion-item>
+
+    <ion-button expand="block" (click)="buscarEntregasDistintasAHoy()">Buscar entregas</ion-button>
+    <ion-searchbar placeholder="Filtrar" (ionChange)="filtrarEntregas($event)"></ion-searchbar>
+
+    <ion-list>
+        <ion-row *ngIf="isHoyScreen">
+          <ion-col size="12" text-center>
+            <ion-text color="secondary">
+              Mostrando entregas procesadas de hoy y entregas sin procesar a re-intentar
+            </ion-text>
+          </ion-col>
+        </ion-row>
+        <ion-item-sliding *ngFor="let entrega of entregasDisplay; let i = index">
+            <ion-item>
+                <ion-row>
+                    <ion-col size="12" *ngIf="entrega.entrega.reintentar == 1">
+                        <strong>
+                            <ion-text color="tertiary">
+                                <strong>Re-intentar</strong>
+                            </ion-text>
+                        </strong>
+                    </ion-col>
+                    <ion-col size="6" *ngIf="entrega.entrega.reintentar != 1">
+                      <ion-text color="tertiary">
+                        <strong>
+                          {{entrega.entrega.estado}}
+                        </strong>
+                      </ion-text>
+                    </ion-col>
+                    <ion-col size="12">
+                        <strong>
+                            Nombre:
+                        </strong>
+                    </ion-col>
+                    <ion-col size="6">
+                        {{entrega.usuario.name}}
+                    </ion-col>
+                    <ion-col size="6" text-center>
+                        <ion-button (click)="verInfo(entrega)">
+                            Ver info
+                        </ion-button>
+                    </ion-col>
+                    <ion-col size="12">
+                        <strong>
+                            Localidad:
+                        </strong>
+                    </ion-col>
+                    <ion-col size="12">
+                        {{entrega.rol.localidad}}
+                    </ion-col>
+                    <ion-col size="12">
+                        <strong>
+                            Observaciones:
+                        </strong>
+                    </ion-col>
+                    <ion-col size="12">
+                        {{entrega.entrega.observaciones}}
+                    </ion-col>
+                    <ion-col size="12" *ngIf="entrega.entrega.reintentar != 1">
+                        <strong>
+                            Procesada en:
+                        </strong>
+                    </ion-col>
+                    <ion-col size="12">
+                        {{entrega.entrega.fecha_de_procesamiento_real}}
+                    </ion-col>
+                </ion-row>
+            </ion-item>
+
+            <ion-item-options side="end">
+                <ion-item-option color="secondary" (click)="modificar(entrega)">Modificar</ion-item-option>
+                <ion-item-option color="success" (click)="entregarSinModificaciones(entrega , i)" *ngIf="entrega.entrega.reintentar == 1">Entregar</ion-item-option>
+            </ion-item-options>
+        </ion-item-sliding>
+        <ion-col size="12" *ngIf="entregasDisplay.length > 20">
+          <ion-text color="tertiary">
+            Mostrando los primeros 20 resultados
+          </ion-text>
+        </ion-col>
+    </ion-list>
+
+
+</ion-content>

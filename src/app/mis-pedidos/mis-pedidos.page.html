@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mis pedidos</ion-title>
+  </ion-toolbar>
+  <ion-searchbar placeholder="Filtrar" (ionChange)="filtrarPedidos($event)"></ion-searchbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list>
+    <ion-item *ngFor="let pedido of pedidosDisplay" detail="true" (click)="irAPedido(pedido)">
+      <ion-row>
+        <ion-col size="12">
+            <strong>
+                Pedido Nº:
+            </strong>
+        </ion-col>
+        <ion-col size="12">
+            {{pedido.id}}
+        </ion-col>
+
+          <ion-col size="12">
+              <strong>
+                  Usuario:
+              </strong>
+          </ion-col>
+          <ion-col size="12">
+              {{pedido.usuario[0].name}}
+          </ion-col>
+
+
+          <ion-col size="12">
+              <strong>
+                  Estado:
+              </strong>
+          </ion-col>
+          <ion-col size="12">
+              {{pedido.estado}}
+          </ion-col>
+          <ion-col size="12">
+              <strong>
+                  Periodicidad:
+              </strong>
+          </ion-col>
+          <ion-col size="12">
+              {{pedido.periodicidad}}
+          </ion-col>
+          <ion-col size="12">
+              <strong>
+                  Repartidor excepcional:
+              </strong>
+          </ion-col>
+          <ion-col size="12">
+              {{pedido.repartidor_excepcional}}
+          </ion-col>
+          <ion-col size="12">
+              <strong>
+                  Dia de entrega:
+              </strong>
+          </ion-col>
+          <ion-col size="12">
+              {{pedido.dia_de_entrega | dia}}
+          </ion-col>
+      </ion-row>
+    </ion-item>
+    <ion-row *ngIf="pedidosDisplay.length == 20">
+      <ion-col size="12">
+        <ion-text color="tertiary">
+          <strong>
+            Mostrando las primeras 20 entradas
+          </strong>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-list>
+
+</ion-content>
