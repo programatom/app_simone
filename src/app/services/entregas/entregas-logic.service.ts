@@ -117,42 +117,42 @@ export class EntregasLogicService {
         });
     }
 
-    filtrarEntregas(entregas, reintentar:Array<number>, derivada:Array<number>, estado:Array<string>, repartidor_excepcional = [], alarma = [0,1], danger = [0,1]) {
-        let entregas_crudas = [];
-        entregas.filter((value) => {
-            let entrega = value.entrega;
+    filtrarEntregas(pedidos, reintentar:Array<number>, derivada:Array<number>, estado:Array<string>, repartidor_excepcional = [], alarma = [0,1], danger = [0,1]) {
+        pedidos.filter((value) => {
+            let entregas_a_mostrar = [];
             let pedido = value.pedido;
-            if (entrega == null) {
-                return;
-            }
+            let entregas = value.entregas;
+            for(let i = 0; i < entregas.length; i ++){
+              let entrega = entregas[i];
+              if(repartidor_excepcional.length == 0){
+                repartidor_excepcional.push(pedido.repartidor_excepcional);
+              }
 
-            if(repartidor_excepcional.length == 0){
-              repartidor_excepcional.push(pedido.repartidor_excepcional);
-            }
+              /*
+              */
+              console.log("------")
+              console.log(pedido.id)
+              console.log(reintentar.includes(entrega.reintentar));
+              console.log(derivada.includes(entrega.derivada))
+              console.log(estado.includes(entrega.estado))
+              console.log(repartidor_excepcional.includes(pedido.repartidor_excepcional));
+              console.log(alarma.includes(pedido.alarma));
+              console.log(danger.includes(pedido.danger));
 
-            /*
-            console.log("------")
-            console.log(pedido.id)
-            console.log(reintentar.includes(entrega.reintentar));
-            console.log(derivada.includes(entrega.derivada))
-            console.log(estado.includes(entrega.estado))
-            console.log(repartidor_excepcional.includes(pedido.repartidor_excepcional));
-            console.log(alarma.includes(pedido.alarma));
-            console.log(danger.includes(pedido.danger));
-
-            console.log("------")
-            */
-            if (reintentar.includes(entrega.reintentar)
-                && derivada.includes(entrega.derivada)
-                && estado.includes(entrega.estado)
-                && repartidor_excepcional.includes(pedido.repartidor_excepcional)
-                && alarma.includes(pedido.alarma)
-                && danger.includes(pedido.danger)
-                ) {
-                entregas_crudas.push(value);
+              console.log("------")
+              if (reintentar.includes(entrega.reintentar)
+              && derivada.includes(entrega.derivada)
+              && estado.includes(entrega.estado)
+              && repartidor_excepcional.includes(pedido.repartidor_excepcional)
+              && alarma.includes(pedido.alarma)
+              && danger.includes(pedido.danger)
+            ) {
+              entregas_a_mostrar.push(entrega);
             }
+            }
+            value.entregas = entregas_a_mostrar;
         });
-        return entregas_crudas;
+        return pedidos;
     }
 
 

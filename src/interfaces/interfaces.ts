@@ -9,7 +9,7 @@ export interface ObjLocalStorage{
 
 
 export interface ObjEntrega{
-  entrega:any,
+  entregas:any,
   pedido:any,
   productos:any,
   usuario:any,

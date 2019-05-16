@@ -13,7 +13,7 @@ import { ToastService, CommonService } from '../services/services.index';
 export class EntregasHabitualesHoyPage implements OnInit {
 
   entregas = [];
-  entregasDisplay = [];
+  pedidosDisplay = [];
 
   danger = [];
 
@@ -50,6 +50,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
       this.danger = entregasDangerDerivadas.concat(entregasDangerPropias);
     });
   }
+
   actualizarEInstanciarProductos(){
     this.entregasHttp.getProductos().subscribe((productos)=>{
       this.entregasLogic.productos = productos.data;
@@ -58,9 +59,9 @@ export class EntregasHabitualesHoyPage implements OnInit {
 
   buscarEntregasDeHoyYfiltrar(){
     this.entregasHttp.getEntregasHabitualesHoy().subscribe((entregas)=>{
-      console.log(entregas)
+      console.log(entregas);
       this.entregas = this.entregasLogic.filtrarEntregas(entregas.data, [0], [0], ["sin procesar"]);
-      this.entregasDisplay = JSON.parse(JSON.stringify(this.entregas));
+      this.pedidosDisplay = JSON.parse(JSON.stringify(this.entregas));
     });
   }
 
@@ -71,11 +72,13 @@ export class EntregasHabitualesHoyPage implements OnInit {
     // En cada elemento del array, sacar las keys de cada obj e iterar esas keys
     let searchKeys = ["nombre" , "user_id", "localidad" , "calle", "role"];
     let results = this.commonServ.filtroArrayObjsOfObjs(this.entregas, filtro, searchKeys);
-    this.entregasDisplay = results;
+    this.pedidosDisplay = results;
   }
 
-  verInfo(entrega){
-    this.entregasLogic.entregaSeleccionada = entrega;
+  verInfo(entrega, index_entrega){
+    this.entregasLogic.entregaSeleccionada = JSON.parse(JSON.stringify(entrega));
+    this.entregasLogic.entregaSeleccionada.entregas = entrega.entregas[index_entrega];
+    console.log(this.entregasLogic.entregaSeleccionada)
     this.entregasLogic.infoPedidoDismissUrl = "/tabs/entregas-habituales-hoy";
     this.navCtrl.navigateForward("/tabs/info-pedido");
   }
@@ -93,7 +96,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
         handler:()=>{
           this.entregasLogic.entregaAReintentarODerivar(entrega,0,1,"").then((respuesta)=>{
             this.entregas.splice(index, 1);
-            this.entregasDisplay.splice(index, 1);
+            this.pedidosDisplay.splice(index, 1);
           });
         }
       }
@@ -105,7 +108,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
   entregarSinModificaciones(entrega:ObjEntrega, index){
     this.entregasLogic.entregarSinModificaciones(entrega).then(()=>{
       this.entregas.splice(index, 1);
-      this.entregasDisplay.splice(index, 1);
+      this.pedidosDisplay.splice(index, 1);
     })
 
   }

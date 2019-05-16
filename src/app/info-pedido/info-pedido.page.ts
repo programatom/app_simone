@@ -16,7 +16,7 @@ export class InfoPedidoPage {
 
   constructor(private entregasLogic: EntregasLogicService,
               private navCtrl: NavController) {
-                this.pedido.entrega = {};
+                this.pedido.entregas = {};
                 this.pedido.rol = {};
                 this.pedido.pedido = {};
                 this.pedido.productos = [];
@@ -26,7 +26,7 @@ export class InfoPedidoPage {
 
   ionViewWillEnter(){
     this.pedido = this.entregasLogic.entregaSeleccionada;
-    this.monto_a_pagar = this.entregasLogic.calcularMontoAPagar(this.pedido.productos, this.pedido.pedido.descuento);
+    this.monto_a_pagar = this.entregasLogic.calcularMontoAPagar(this.pedido.entregas.productos, this.pedido.pedido.descuento);
   }
 
 
