@@ -3,6 +3,7 @@ import { EntregasHttpService, CommonService, ToastService } from '../services/se
 import { EntregasLogicService } from '../services/entregas/entregas-logic.service';
 import { ObjEntrega } from 'src/interfaces/interfaces';
 import { NavController } from '@ionic/angular';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-entregas-procesadas',
@@ -15,7 +16,7 @@ export class EntregasProcesadasPage implements OnInit {
   fechaHasta:string;
   hoy:string;
 
-  entregasDisplay = [];
+  pedidosDisplay = [];
   entregas = [];
 
   isHoyScreen = true;
@@ -24,7 +25,33 @@ export class EntregasProcesadasPage implements OnInit {
               private entregasLogic: EntregasLogicService,
               private navCtrl: NavController,
               private commonServ: CommonService,
-              private toastServ: ToastService) { }
+              private toastServ: ToastService,
+              private router: Router) {
+                this.routeEvent(this.router);
+
+              }
+
+  routeEvent(router: Router){
+    router.events.subscribe(e => {
+      if(e instanceof NavigationEnd){
+        if(e.url == "/tabs/entregas-procesadas"){
+          if(this.entregasLogic.entregaModificadaYProcesada){
+            this.refreshCurrentView();
+            this.entregasLogic.entregaModificadaYProcesada = false;
+          }
+        }
+      }
+    });
+  }
+
+  refreshCurrentView(){
+    if(this.isHoyScreen){
+      this.buscarFechaDeHoyYInicializarPantalla();
+    }else{
+      this.buscarEntregasDistintasAHoy()
+    }
+  }
+
 
   ngOnInit() {
     this.buscarFechaDeHoyYInicializarPantalla();
@@ -34,31 +61,34 @@ export class EntregasProcesadasPage implements OnInit {
     let hoy = new Date();
     this.fechaDesde = hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
     this.hoy = this.fechaDesde;
-    hoy.setDate(hoy.getDate() + 1);
-    this.fechaHasta = hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
-    this.inicializarEntregasConReintentarYSinProcesar().then(()=>{
+    //hoy.setDate(hoy.getDate() + 1);
+    //this.fechaHasta = hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
+    this.fechaHasta = this.hoy;
+    this.inicializarEntregasConReintentarYProcesadasHoy().then(()=>{
       return;
     });
   }
 
-  inicializarEntregasConReintentarYSinProcesar(){
-    this.entregasDisplay = [];
+  inicializarEntregasConReintentarYProcesadasHoy(){
+    this.pedidosDisplay = [];
     return new Promise((resolve)=>{
-      this.buscarEntregas().then((entregas:Array<any>)=>{
-        entregas.filter((value)=>{
-          if(value.entrega.reintentar == 1){
-            this.entregas.push(value);
-            this.entregasDisplay.push(value);
-          }
-
-          if(value.entrega.estado != "sin procesar"){
-            this.entregas.push(value);
-            this.entregasDisplay.push(value);
-          }
+      this.buscarPedidos().then((pedidos:Array<any>)=>{
+        console.log(pedidos);
+        pedidos.filter((pedido)=>{
+          let entregasPedido = pedido.entregas;
+          let pedidoIn = false;
+          entregasPedido.filter((entrega)=>{
+            if(entrega.reintentar == 1 || entrega.estado != "sin procesar"){
+              if(!pedidoIn){
+                pedidoIn = true;
+                this.pedidosDisplay.push(pedido);
+              }
+            }
+          });
         })
       });
       resolve();
-    })
+    });
 
   }
 
@@ -92,13 +122,12 @@ export class EntregasProcesadasPage implements OnInit {
     }
  }
 
- buscarEntregas(){
+ buscarPedidos(){
    return new Promise((resolve)=>{
      let data = {
        "desde": this.fechaDesde,
        "hasta": this.fechaHasta
      }
-     console.log(data);
      this.entregasHttp.getEntregasDateFilter(data).subscribe((respuesta)=>{
        console.log(respuesta)
        resolve(respuesta.data);
@@ -108,15 +137,13 @@ export class EntregasProcesadasPage implements OnInit {
 
  buscarEntregasDistintasAHoy(){
    this.isHoyScreen = false;
-   this.buscarEntregas().then((entregas:any)=>{
-     entregas = this.entregasLogic.filtrarEntregas(entregas, [0,1], [0,1], ["cancelada", "entregada"]);
-     if(entregas.length > 20){
-       this.entregas = JSON.parse(JSON.stringify(entregas));
-       this.entregasDisplay = entregas.splice(0, 20);
+   this.buscarPedidos().then((pedidos:any)=>{
+     pedidos = this.entregasLogic.filtrarEntregas(pedidos, [0,1], [0,1], ["cancelada", "entregada"]);
+     if(pedidos.length > 20){
+       this.pedidosDisplay = pedidos.splice(0, 20);
        return;
      }
-     this.entregas = JSON.parse(JSON.stringify(entregas));
-     this.entregasDisplay = entregas;
+     this.pedidosDisplay = pedidos;
    })
  }
 
@@ -126,23 +153,23 @@ export class EntregasProcesadasPage implements OnInit {
    event.target.complete();
  }
 
- entregarSinModificaciones(entrega:ObjEntrega, index){
-   this.entregasLogic.entregarSinModificaciones(entrega).then(()=>{
-     this.entregas.splice(index, 1);
-     this.entregasDisplay.splice(index, 1);
+ entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
+   this.linkEntregaSelectedForNavigation(pedido, index_entrega);
+   this.entregasLogic.entregarSinModificaciones(pedido).then(()=>{
+     this.pedidosDisplay[index_pedido].entregas.splice(index_entrega, 1);
    });
  }
 
 
- verInfo(entrega){
-   this.entregasLogic.entregaSeleccionada = entrega;
+ verInfo(pedido, index_entrega){
+   this.linkEntregaSelectedForNavigation(pedido, index_entrega);
    this.entregasLogic.infoPedidoDismissUrl = "/tabs/entregas-procesadas";
    this.navCtrl.navigateForward("/tabs/info-pedido");
  }
 
  filtroAdelantadas(entrega){
-   if(entrega.entrega.adelanta == 1){
-     let fechaPotencialEntrega = entrega.entrega.fecha_de_entrega_potencial;
+   if(entrega.adelanta == 1){
+     let fechaPotencialEntrega = entrega.fecha_de_entrega_potencial;
      if(fechaPotencialEntrega == this.hoy){
        return;
      }else{
@@ -152,9 +179,15 @@ export class EntregasProcesadasPage implements OnInit {
    }
  }
 
- modificar(entrega){
-   this.filtroAdelantadas(entrega);
-   this.entregasLogic.entregaSeleccionada = entrega;
+ linkEntregaSelectedForNavigation(pedido, index_entrega){
+   this.entregasLogic.pedidoSeleccionado = JSON.parse(JSON.stringify(pedido));
+   this.entregasLogic.pedidoSeleccionado.entregas = pedido.entregas[index_entrega];
+   return;
+ }
+
+ modificar(pedido, index_entrega){
+   this.filtroAdelantadas(pedido.entregas[index_entrega]);
+   this.linkEntregaSelectedForNavigation(pedido, index_entrega)
    this.entregasLogic.modificarPedidoDismissUrl = "/tabs/entregas-procesadas";
    this.entregasLogic.isScheduled = true;
    this.navCtrl.navigateForward("/modificar-pedido");
@@ -182,7 +215,7 @@ export class EntregasProcesadasPage implements OnInit {
    // En cada elemento del array, sacar las keys de cada obj e iterar esas keys
    let searchKeys = ["nombre" , "user_id", "localidad" , "calle", "role", "observaciones" , "estado"];
    let results = this.commonServ.filtroArrayObjsOfObjs(this.entregas, filtro, searchKeys);
-   this.entregasDisplay = results;
+   this.pedidosDisplay = results;
  }
 
 

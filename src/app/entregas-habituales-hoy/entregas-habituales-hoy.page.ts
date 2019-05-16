@@ -4,6 +4,7 @@ import { EntregasLogicService } from '../services/entregas/entregas-logic.servic
 import { NavController } from '@ionic/angular';
 import { ObjEntrega } from 'src/interfaces/interfaces';
 import { ToastService, CommonService } from '../services/services.index';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-entregas-habituales-hoy',
@@ -21,8 +22,24 @@ export class EntregasHabitualesHoyPage implements OnInit {
               private entregasLogic: EntregasLogicService,
               private navCtrl: NavController,
               private toastServ: ToastService,
-              private commonServ: CommonService) { }
+              private commonServ: CommonService,
+              private router: Router) {
+                this.routeEvent(this.router);
 
+              }
+
+    routeEvent(router: Router){
+      router.events.subscribe(e => {
+        if(e instanceof NavigationEnd){
+          if(e.url == "/tabs/entregas-habituales-hoy"){
+            this.buscarEntregasDeHoyYfiltrar();
+            if(this.entregasLogic.entregaModificadaYProcesada){
+              this.entregasLogic.entregaModificadaYProcesada = false;
+            }
+          }
+        }
+      });
+    }
   ngOnInit() {
     this.buscarEntregasDeHoyYfiltrar();
     this.actualizarEInstanciarProductos();
@@ -60,8 +77,8 @@ export class EntregasHabitualesHoyPage implements OnInit {
   buscarEntregasDeHoyYfiltrar(){
     this.entregasHttp.getEntregasHabitualesHoy().subscribe((entregas)=>{
       console.log(entregas);
-      this.entregas = this.entregasLogic.filtrarEntregas(entregas.data, [0], [0], ["sin procesar"]);
-      this.pedidosDisplay = JSON.parse(JSON.stringify(this.entregas));
+      let pedidos = this.entregasLogic.filtrarEntregas(entregas.data, [0], [0], ["sin procesar"]);
+      this.pedidosDisplay = JSON.parse(JSON.stringify(pedidos));
     });
   }
 
@@ -75,15 +92,13 @@ export class EntregasHabitualesHoyPage implements OnInit {
     this.pedidosDisplay = results;
   }
 
-  verInfo(entrega, index_entrega){
-    this.entregasLogic.entregaSeleccionada = JSON.parse(JSON.stringify(entrega));
-    this.entregasLogic.entregaSeleccionada.entregas = entrega.entregas[index_entrega];
-    console.log(this.entregasLogic.entregaSeleccionada)
+  verInfo(pedido, index_entrega){
+    this.linkEntregaSelectedForNavigation(pedido,index_entrega);
     this.entregasLogic.infoPedidoDismissUrl = "/tabs/entregas-habituales-hoy";
     this.navCtrl.navigateForward("/tabs/info-pedido");
   }
 
-  reintentar(entrega, index){
+  reintentar(pedido, index_pedido, index_entrega){
 
     let header = "Re-intentar la entrega mas tarde";
     let buttons = [
@@ -94,9 +109,10 @@ export class EntregasHabitualesHoyPage implements OnInit {
       {
         text:"Aceptar",
         handler:()=>{
-          this.entregasLogic.entregaAReintentarODerivar(entrega,0,1,"").then((respuesta)=>{
-            this.entregas.splice(index, 1);
-            this.pedidosDisplay.splice(index, 1);
+          this.linkEntregaSelectedForNavigation(pedido,index_entrega);
+
+          this.entregasLogic.entregaAReintentarODerivar(this.entregasLogic.pedidoSeleccionado,0,1,"").then((respuesta)=>{
+            this.pedidosDisplay[index_pedido].entregas.splice(index_entrega, 1);
           });
         }
       }
@@ -105,32 +121,25 @@ export class EntregasHabitualesHoyPage implements OnInit {
     this.toastServ.presentAlert(header, undefined, undefined, buttons);
   }
 
-  entregarSinModificaciones(entrega:ObjEntrega, index){
-    this.entregasLogic.entregarSinModificaciones(entrega).then(()=>{
-      this.entregas.splice(index, 1);
-      this.pedidosDisplay.splice(index, 1);
-    })
-
+  linkEntregaSelectedForNavigation(pedido, index_entrega){
+    this.entregasLogic.pedidoSeleccionado = JSON.parse(JSON.stringify(pedido));
+    this.entregasLogic.pedidoSeleccionado.entregas = pedido.entregas[index_entrega];
+    return;
   }
 
-  modificar(entrega){
-    this.entregasLogic.entregaSeleccionada = entrega;
+  entregarSinModificaciones(entrega:ObjEntrega, index_pedido, index_entrega){
+    this.linkEntregaSelectedForNavigation(entrega, index_entrega);
+    this.entregasLogic.entregarSinModificaciones(this.entregasLogic.pedidoSeleccionado).then(()=>{
+      this.pedidosDisplay[index_pedido].entregas.splice(index_entrega, 1);
+    });
+  }
+
+  modificar(pedido, index_entrega){
+    this.linkEntregaSelectedForNavigation(pedido,index_entrega);
     this.entregasLogic.modificarPedidoDismissUrl = "/tabs/entregas-habituales-hoy";
     this.entregasLogic.isScheduled = true;
     this.navCtrl.navigateForward("/modificar-pedido");
   }
 
-  ionViewWillEnter(){
-    if(this.entregasLogic.entregaModificadaYProcesada){
-      this.entregasLogic.entregaModificadaYProcesada = false;
-      this.checkearCambiosEnLasEntregasHabituales();
-    }
-  }
-
-
-
-  checkearCambiosEnLasEntregasHabituales(){
-    this.buscarEntregasDeHoyYfiltrar();
-  }
 
 }

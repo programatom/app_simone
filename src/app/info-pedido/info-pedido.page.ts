@@ -25,7 +25,7 @@ export class InfoPedidoPage {
               }
 
   ionViewWillEnter(){
-    this.pedido = this.entregasLogic.entregaSeleccionada;
+    this.pedido = this.entregasLogic.pedidoSeleccionado;
     this.monto_a_pagar = this.entregasLogic.calcularMontoAPagar(this.pedido.entregas.productos, this.pedido.pedido.descuento);
   }
 

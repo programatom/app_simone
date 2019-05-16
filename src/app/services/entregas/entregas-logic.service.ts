@@ -8,7 +8,7 @@ import { ToastService } from '../toast/toast.service';
 })
 export class EntregasLogicService {
 
-    entregaSeleccionada = {} as ObjEntrega;
+    pedidoSeleccionado = {} as ObjEntrega;
     arrayEntregasSeleccionado:Array<ObjEntrega> = [];
     entregaModificadaYProcesada = false;
     productos = [];
@@ -22,7 +22,7 @@ export class EntregasLogicService {
 
 
 
-    entregarSinModificaciones(entrega) {
+    entregarSinModificaciones(pedido) {
 
         return new Promise((resolve) => {
             let header = "Entregar sin ninguna modificación en los productos entregados ni en el monto a pagar";
@@ -34,7 +34,7 @@ export class EntregasLogicService {
                 {
                     text: "Aceptar",
                     handler: () => {
-                        this.procesar(entrega, entrega.productos, "Entregada sin modificaciones", "entregada", 0).then((respuesta) => {
+                        this.procesar(pedido, pedido.entregas.productos, "Entregada sin modificaciones", "entregada", 0).then((respuesta) => {
                             resolve()
                         });
                     }
@@ -68,7 +68,7 @@ export class EntregasLogicService {
 
         return new Promise((resolve) => {
             let peticion = new Object() as ObjProcesamientoEntrega;
-            peticion.entrega_id = pedido.entrega.id;
+            peticion.entrega_id = pedido.entregas.id;
             peticion.data = new Object() as DataProcesamiento;
             peticion.data.derivada = derivar;
             peticion.data.reintentar = reintentar;
@@ -85,7 +85,7 @@ export class EntregasLogicService {
         return new Promise((resolve) => {
             let peticion = new Object() as ObjProcesamientoEntrega;
 
-            peticion.entrega_id = entrega.entrega.id;
+            peticion.entrega_id = entrega.entregas.id;
             peticion.data = new Object() as DataProcesamiento;
             peticion.data.derivada = 0;
             peticion.data.reintentar = 0;
@@ -129,7 +129,6 @@ export class EntregasLogicService {
               }
 
               /*
-              */
               console.log("------")
               console.log(pedido.id)
               console.log(reintentar.includes(entrega.reintentar));
@@ -140,6 +139,7 @@ export class EntregasLogicService {
               console.log(danger.includes(pedido.danger));
 
               console.log("------")
+              */
               if (reintentar.includes(entrega.reintentar)
               && derivada.includes(entrega.derivada)
               && estado.includes(entrega.estado)

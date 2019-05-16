@@ -1,6 +1,6 @@
 <ion-header>
     <ion-toolbar>
-        <ion-title *ngIf="entregasLogic.isScheduled">Entrega Nº {{entrega.entrega.id}}</ion-title>
+        <ion-title *ngIf="entregasLogic.isScheduled">Entrega Nº {{pedido.entregas.id}}</ion-title>
         <ion-title *ngIf="!entregasLogic.isScheduled">Entrega Nueva</ion-title>
 
         <ion-buttons slot="start">
@@ -13,14 +13,14 @@
 
 </ion-header>
 
-<ion-content>
+<ion-content padding>
 
     <ion-row>
 
         <ion-col size="12" text-center *ngIf="entregasLogic.isScheduled">
           <ion-text color ="tertiary" style="font-size:6vw">
             <strong>Estado: </strong>
-          {{entrega.entrega.estado}}
+          {{pedido.entregas.estado}}
         </ion-text>
         </ion-col>
         <ion-col size="12">
@@ -30,38 +30,40 @@
         </ion-col>
         <div *ngIf="entregasLogic.isScheduled" style="width:100%">
           <ion-col size="12">
-            <ion-button expand="full" color="danger" (click)="cancelar()" [disabled]="entrega.entrega.estado == 'cancelada'">
+            <ion-button expand="full" color="danger" (click)="cancelar()" [disabled]="pedido.entregas.estado == 'cancelada'">
               Cancelar
-            </ion-button>
-          </ion-col>
-          <ion-col size="12" *ngIf="entrega.entrega.estado == 'sin procesar'">
-            <ion-button expand="full" color="tertiary" (click)="derivar()">
-              Derivar a {{entrega.pedido.repartidor_excepcional}}
             </ion-button>
           </ion-col>
         </div>
 
-        <ion-item color="primary" lines="none" text-wrap *ngFor="let producto of productos; let i = index">
-            <ion-buttons slot="end">
+        <ion-row class="justify-content-center">
+          <ion-col>
+
+            <ion-item color="primary" lines="none" text-wrap *ngFor="let producto of productos; let i = index">
+              <ion-buttons slot="end">
                 <ion-icon style="font-size: 8vw" name="close-circle" (click)="eliminar(i)" color="light" item-end>
                 </ion-icon>
                 <ion-icon style="font-size: 8vw" name="add-circle" (click)="agregar(i)" color="light" item-end>
                 </ion-icon>
-            </ion-buttons>
-            <ion-text class="text-light">
+              </ion-buttons>
+              <ion-text class="text-light">
                 <strong style="font-size:6vw;"> {{producto.cantidad}} </strong> | {{producto.nombre}} <strong>$ {{producto.precio}} c/u</strong>
-            </ion-text>
-        </ion-item>
-        <ion-row>
-          <ion-col size="12">
-            <ion-item>
-              <ion-label>Productos</ion-label>
-              <ion-select interface="alert" multiple="false" placeholder="Elija un producto" (ionChange)="seleccionProducto($event)">
-                <ion-select-option [value]="producto" *ngFor="let producto of productosDeLaEmpresa">{{producto.nombre}}</ion-select-option>
-              </ion-select>
+              </ion-text>
             </ion-item>
+            <ion-row>
+              <ion-col size="12">
+                <ion-item>
+                  <ion-label>Productos</ion-label>
+                  <ion-select interface="alert" multiple="false" placeholder="Elija un producto" (ionChange)="seleccionProducto($event)">
+                    <ion-select-option [value]="producto" *ngFor="let producto of productosDeLaEmpresa">{{producto.nombre}}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+            </ion-row>
           </ion-col>
+
         </ion-row>
+
 
         <ion-col size="12">
             <ion-item>

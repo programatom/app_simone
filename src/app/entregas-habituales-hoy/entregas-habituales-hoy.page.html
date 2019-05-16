@@ -13,10 +13,10 @@
 
 <ion-content>
     <ion-list>
-      <div *ngFor="let pedido of pedidosDisplay; let i = index">
+      <div *ngFor="let pedido of pedidosDisplay; let index_pedido = index">
         <ion-item-sliding *ngFor="let entrega of pedido.entregas; let index_entrega = index">
           <ion-item-options side="start" text-wrap>
-            <ion-item-option (click)="reintentar(pedido, i)" color="primary">Re-intentar</ion-item-option>
+            <ion-item-option (click)="reintentar(pedido, index_pedido, index_entrega)" color="primary">Re-intentar</ion-item-option>
           </ion-item-options>
 
           <ion-item>
@@ -60,8 +60,8 @@
           </ion-item>
 
           <ion-item-options side="end">
-            <ion-item-option color="secondary" (click)="modificar(pedido)">Modificar</ion-item-option>
-            <ion-item-option color="success" (click)="entregarSinModificaciones(pedido , i)">Entregar</ion-item-option>
+            <ion-item-option color="secondary" (click)="modificar(pedido, index_entrega)">Modificar</ion-item-option>
+            <ion-item-option color="success" (click)="entregarSinModificaciones(pedido , index_pedido, index_entrega)">Entregar</ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
 

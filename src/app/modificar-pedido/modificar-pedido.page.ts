@@ -12,7 +12,7 @@ import { PedidosService } from '../services/pedidos/pedidos.service';
 })
 export class ModificarPedidoPage implements OnInit {
 
-  entrega = new Object as ObjEntrega;
+  pedido = new Object as ObjEntrega;
 
   pagaCon:number = 0;
   montoAPagar:number = 0;
@@ -26,19 +26,17 @@ export class ModificarPedidoPage implements OnInit {
               private navCtrl: NavController,
               private toastServ: ToastService,
               private pedidosServ: PedidosService) {
-                this.entrega.entrega = {};
-                this.entrega.rol = {};
-                this.entrega.pedido = {};
-                this.entrega.productos = [];
-                this.entrega.usuario = {};
+                this.pedido.entregas = {};
+                this.pedido.rol = {};
+                this.pedido.pedido = {};
+                this.pedido.productos = [];
+                this.pedido.usuario = {};
               }
 
   ngOnInit() {
   }
 
   ionViewWillEnter(){
-    console.log(this.entregasLogic.isScheduled)
-
     if(this.entregasLogic.isScheduled){
       this.scheduledLogic();
     }else{
@@ -53,22 +51,25 @@ export class ModificarPedidoPage implements OnInit {
   }
 
   scheduledLogic(){
-    console.log("ScheduledLogic")
-    this.entrega = this.entregasLogic.entregaSeleccionada;
-    this.descuento = this.entrega.pedido.descuento;
-    this.montoAPagar = this.entregasLogic.calcularMontoAPagar(this.entrega.productos, this.descuento);
-    if(this.entrega.entrega.estado != "sin procesar"){
-      this.pagaCon = this.entrega.entrega.paga_con;
-      this.entregasAdelantadas = this.entrega.entrega.entregas_adelantadas;
+
+    this.pedido = this.entregasLogic.pedidoSeleccionado;
+    this.descuento = this.pedido.pedido.descuento;
+    this.observaciones = this.pedido.entregas.observaciones;
+    console.log(this.pedido.entregas);
+    this.montoAPagar = this.entregasLogic.calcularMontoAPagar(this.pedido.entregas.productos, this.descuento);
+
+    if(this.pedido.entregas.estado != "sin procesar"){
+      this.pagaCon = this.pedido.entregas.paga_con;
+      this.entregasAdelantadas = this.pedido.entregas.entregas_adelantadas;
     }else{
       this.pagaCon = this.montoAPagar;
     }
-    this.productos = JSON.parse(JSON.stringify(this.entrega.productos));
+    this.productos = JSON.parse(JSON.stringify(this.pedido.entregas.productos));
     this.productosDeLaEmpresa = this.entregasLogic.productos;
   }
 
   dismiss(){
-    this.navCtrl.navigateBack(this.entregasLogic.modificarPedidoDismissUrl)
+    this.navCtrl.navigateRoot(this.entregasLogic.modificarPedidoDismissUrl)
   }
 
   agregar(i){
@@ -115,7 +116,7 @@ export class ModificarPedidoPage implements OnInit {
       {
         text:"Aceptar",
         handler:()=>{
-          this.entregasLogic.procesar(this.entrega, [], this.observaciones, "cancelada",0,0).then((respuesta)=>{
+          this.entregasLogic.procesar(this.pedido, [], this.observaciones, "cancelada",0,0).then((respuesta)=>{
             this.entregasLogic.entregaModificadaYProcesada = true;
             this.dismiss();
           });
@@ -139,7 +140,7 @@ export class ModificarPedidoPage implements OnInit {
       {
         text:"Aceptar",
         handler:()=>{
-          this.entregasLogic.entregaAReintentarODerivar(this.entrega, 1, 0, this.observaciones).then((respuesta)=>{
+          this.entregasLogic.entregaAReintentarODerivar(this.pedido, 1, 0, this.observaciones).then((respuesta)=>{
             this.entregasLogic.entregaModificadaYProcesada = true;
             this.dismiss();
           });
@@ -163,7 +164,7 @@ export class ModificarPedidoPage implements OnInit {
       {
         text:"Aceptar",
         handler:()=>{
-          this.entregasLogic.procesar(this.entrega, this.productos, this.observaciones, "entregada",this.entregasAdelantadas,this.pagaCon).then((respuesta)=>{
+          this.entregasLogic.procesar(this.pedido, this.productos, this.observaciones, "entregada",this.entregasAdelantadas,this.pagaCon).then((respuesta)=>{
             this.entregasLogic.entregaModificadaYProcesada = true;
             this.dismiss();
           });
