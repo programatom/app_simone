@@ -19,13 +19,14 @@ export class PedidoVisualizerPage implements OnInit {
 
   ngOnInit() {
     this.pedido = this.pedidosServ.pedidoSeleccionado;
-    this.monto_a_pagar = this.entregasLogic.calcularMontoAPagar(this.pedido.productos, this.pedido.descuento);
+    this.monto_a_pagar = this.entregasLogic.calcularMontoAPagar(this.pedido.pedido.productos, this.pedido.pedido.descuento, this.pedido.pedido.expiracion_descuento);
   }
 
   nuevaEntrega(){
+    this.entregasLogic.pedidoSeleccionado = this.pedido;
     this.entregasLogic.isScheduled = false;
     this.entregasLogic.modificarPedidoDismissUrl = "/pedido-visualizer"
-    this.navCtrl.navigateForward("/modificar-pedido")
+    this.navCtrl.navigateForward("/modificar-pedido");
   }
 
   dismiss(){

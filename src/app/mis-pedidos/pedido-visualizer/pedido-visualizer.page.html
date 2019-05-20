@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Pedido Nº {{pedido.id}}</ion-title>
+    <ion-title>Pedido Nº {{pedido.pedido.id}}</ion-title>
     <ion-buttons slot="start">
         <ion-button (click)="dismiss()">
             <ion-icon name="arrow-back" style="font-size:7vw">
@@ -78,7 +78,7 @@
     </ion-col>
   </ion-row>
 
-  <ion-item *ngFor="let producto of pedido.productos">
+  <ion-item *ngFor="let producto of pedido.pedido.productos">
     <ion-row>
       <ion-col size="12">
         {{producto.nombre}}
@@ -129,7 +129,7 @@
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      {{pedido.usuario[0].name}}
+      {{pedido.usuario.name}}
     </ion-col>
     <ion-col text-center size="12">
       <strong>
@@ -137,7 +137,7 @@
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      {{pedido.usuario[0].saldo}}
+      {{pedido.usuario.saldo}}
     </ion-col>
     <ion-col text-center size="12">
       <strong>
@@ -145,7 +145,7 @@
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      {{pedido.usuario[0].email}}
+      {{pedido.usuario.email}}
     </ion-col>
 
     <ion-col text-center size="12">
@@ -154,7 +154,7 @@
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      {{pedido.usuario[0].role}}
+      {{pedido.usuario.role}}
     </ion-col>
   </ion-row>
 
@@ -175,7 +175,15 @@
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      % {{pedido.descuento}}
+      % {{pedido.pedido.descuento}}
+    </ion-col>
+    <ion-col text-center size="12">
+      <strong>
+        Fecha de expiración:
+      </strong>
+    </ion-col>
+    <ion-col text-center size="12">
+      {{pedido.pedido.expiracion_descuento}}
     </ion-col>
     <ion-col text-center size="12">
       <strong>
@@ -183,7 +191,7 @@
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      {{pedido.dia_de_entrega | dia}}
+      {{pedido.pedido.dia_de_entrega | dia}}
     </ion-col>
     <ion-col text-center size="12">
       <strong>
@@ -191,7 +199,7 @@
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      {{pedido.periodicidad}}
+      {{pedido.pedido.periodicidad}}
     </ion-col>
   </ion-row>
 

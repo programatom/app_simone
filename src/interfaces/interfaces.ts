@@ -18,6 +18,7 @@ export interface ObjEntrega{
 
 export interface ObjProcesamientoEntrega{
   entrega_id:number,
+  pedido_id:number,
   data:DataProcesamiento
 }
 

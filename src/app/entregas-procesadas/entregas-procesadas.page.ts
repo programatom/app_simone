@@ -15,16 +15,15 @@ export class EntregasProcesadasPage implements OnInit {
   fechaDesde:string;
   fechaHasta:string;
   hoy:string;
-
+  pedidosTotales = [];
   pedidosDisplay = [];
-  entregas = [];
 
   isHoyScreen = true;
 
   constructor(private entregasHttp: EntregasHttpService,
               private entregasLogic: EntregasLogicService,
               private navCtrl: NavController,
-              private commonServ: CommonService,
+              public commonServ: CommonService,
               private toastServ: ToastService,
               private router: Router) {
                 this.routeEvent(this.router);
@@ -58,8 +57,7 @@ export class EntregasProcesadasPage implements OnInit {
   }
 
   async buscarFechaDeHoyYInicializarPantalla(){
-    let hoy = new Date();
-    this.fechaDesde = hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
+    this.fechaDesde = this.commonServ.hoy();
     this.hoy = this.fechaDesde;
     //hoy.setDate(hoy.getDate() + 1);
     //this.fechaHasta = hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
@@ -71,6 +69,7 @@ export class EntregasProcesadasPage implements OnInit {
 
   inicializarEntregasConReintentarYProcesadasHoy(){
     this.pedidosDisplay = [];
+    this.pedidosTotales = [];
     return new Promise((resolve)=>{
       this.buscarPedidos().then((pedidos:Array<any>)=>{
         console.log(pedidos);
@@ -81,6 +80,7 @@ export class EntregasProcesadasPage implements OnInit {
             if(entrega.reintentar == 1 || entrega.estado != "sin procesar"){
               if(!pedidoIn){
                 pedidoIn = true;
+                this.pedidosTotales.push(pedido);
                 this.pedidosDisplay.push(pedido);
               }
             }
@@ -95,14 +95,7 @@ export class EntregasProcesadasPage implements OnInit {
   // HISTORIAL, MUESTRA TODAS LAS ENTREGAS != SIN PROCESAR
   // HOY, MUESTRA TODAS LAS ENTREGAS DE HOY A REINTENTAR Y SIN PROCESAR
 
-  addCeroToNumber(number) {
 
-  if (parseInt(number) < 10) {
-    return "0" + parseInt(number);
-  } else {
-    return number.toString();
-  }
-}
 
   elegirFecha(event, tipo){
     console.log(event)
@@ -140,9 +133,11 @@ export class EntregasProcesadasPage implements OnInit {
    this.buscarPedidos().then((pedidos:any)=>{
      pedidos = this.entregasLogic.filtrarEntregas(pedidos, [0,1], [0,1], ["cancelada", "entregada"]);
      if(pedidos.length > 20){
+       this.pedidosTotales = pedidos.splice(0, 20)
        this.pedidosDisplay = pedidos.splice(0, 20);
        return;
      }
+     this.pedidosTotales = pedidos;
      this.pedidosDisplay = pedidos;
    })
  }
@@ -186,8 +181,9 @@ export class EntregasProcesadasPage implements OnInit {
  }
 
  modificar(pedido, index_entrega){
+   console.log(pedido)
    this.filtroAdelantadas(pedido.entregas[index_entrega]);
-   this.linkEntregaSelectedForNavigation(pedido, index_entrega)
+   this.linkEntregaSelectedForNavigation(pedido, index_entrega);
    this.entregasLogic.modificarPedidoDismissUrl = "/tabs/entregas-procesadas";
    this.entregasLogic.isScheduled = true;
    this.navCtrl.navigateForward("/modificar-pedido");
@@ -211,10 +207,8 @@ export class EntregasProcesadasPage implements OnInit {
  filtrarEntregas(event){
    let filtro = event.detail.value;
 
-   // ARRAY    OBJs   ENTREGA obj  PEDIDO obj USUARIO ROL obj
-   // En cada elemento del array, sacar las keys de cada obj e iterar esas keys
-   let searchKeys = ["nombre" , "user_id", "localidad" , "calle", "role", "observaciones" , "estado"];
-   let results = this.commonServ.filtroArrayObjsOfObjs(this.entregas, filtro, searchKeys);
+   let pedidosCopy = JSON.parse(JSON.stringify(this.pedidosTotales));
+   let results = this.commonServ.filtroArrayObjsOfObjs(pedidosCopy, filtro);
    this.pedidosDisplay = results;
  }
 

@@ -42,12 +42,12 @@ export class ModificarPedidoPage implements OnInit {
     }else{
       this.newUnscheduledLogic();
     }
+
   }
 
   newUnscheduledLogic(){
-    this.descuento = this.pedidosServ.pedidoSeleccionado.descuento;
+    this.pedido = this.entregasLogic.pedidoSeleccionado;
     this.productosDeLaEmpresa = this.entregasLogic.productos;
-
   }
 
   scheduledLogic(){
@@ -55,8 +55,7 @@ export class ModificarPedidoPage implements OnInit {
     this.pedido = this.entregasLogic.pedidoSeleccionado;
     this.descuento = this.pedido.pedido.descuento;
     this.observaciones = this.pedido.entregas.observaciones;
-    console.log(this.pedido.entregas);
-    this.montoAPagar = this.entregasLogic.calcularMontoAPagar(this.pedido.entregas.productos, this.descuento);
+    this.montoAPagar = this.entregasLogic.calcularMontoAPagar(this.pedido.entregas.productos, this.descuento,this.pedido.pedido.expiracion_descuento);
 
     if(this.pedido.entregas.estado != "sin procesar"){
       this.pagaCon = this.pedido.entregas.paga_con;
@@ -78,7 +77,7 @@ export class ModificarPedidoPage implements OnInit {
   }
 
   actualizarDatosDePago(){
-    this.montoAPagar = this.entregasLogic.calcularMontoAPagar(this.productos, this.descuento);
+    this.montoAPagar = this.entregasLogic.calcularMontoAPagar(this.productos, this.pedido.pedido.descuento, this.pedido.pedido.expiracion_descuento);
     this.pagaCon = this.montoAPagar;
     return;
   }
@@ -184,7 +183,4 @@ export class ModificarPedidoPage implements OnInit {
     });
     this.actualizarDatosDePago();
   }
-
-
-
 }

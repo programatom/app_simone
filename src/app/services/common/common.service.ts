@@ -7,31 +7,80 @@ export class CommonService {
 
   constructor() { }
 
-  filtroArrayObjsOfObjs(array:Array<any>, filtro, searchKeys){
-    let results = [];
-    array.filter((objGlobal)=>{
-      let isMatch = false;
-      let objectGlobalKeys = Object.keys(objGlobal);
+  hoy(){
+    let hoy = new Date();
 
-      for(let i = 0; i < objectGlobalKeys.length; i ++){
-        var objLocal = objGlobal[objectGlobalKeys[i]];
-        var localObjectKeys = Object.keys(objLocal);
-        for (let j = 0; j < localObjectKeys.length; j ++){
-          var valueInLocalObj = objLocal[localObjectKeys[j]];
-          for(let k = 0; k < searchKeys.length; k ++){
-            let searchKey = searchKeys[k];
-            if(searchKey == localObjectKeys[j]){
-              if(valueInLocalObj.toString().toLowerCase().search(filtro.toString().toLowerCase()) != - 1){
-                isMatch = true;
-              }
-            }
-          }
+    return hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
+  }
+
+  givenDateTimeline(givenDate){
+    let hoy = this.hoy();
+    givenDate = new Date(givenDate);
+    let hoyObj = new Date(hoy);
+    if(hoyObj == givenDate){
+      return "present";
+    }else if (hoyObj > givenDate){
+      return "past";
+    }else{
+      return "future";
+    }
+  }
+
+  addCeroToNumber(number) {
+
+  if (parseInt(number) < 10) {
+    return "0" + parseInt(number);
+  } else {
+    return number.toString();
+  }
+}
+  filtroArrayObjsOfObjs(array:Array<any>, filtro){
+    let results = [];
+    if(filtro == ""){
+      return array;
+    }
+
+    filtro = filtro.toLowerCase();
+
+    for (let i = 0; i < array.length; i ++){
+      let pedido = array[i];
+      let pedidoArray = [
+        pedido.usuario.email,
+        pedido.usuario.name.toLowerCase(),
+        pedido.usuario.id,
+        pedido.rol.calle == null? pedido.rol.calle: pedido.rol.calle.toLowerCase(),
+        pedido.rol.localidad == null? pedido.rol.localidad: pedido.rol.localidad.toLowerCase(),
+        pedido.rol.provincia == null? pedido.rol.provincia: pedido.rol.provincia.toLowerCase(),
+        pedido.rol.observaciones == null? pedido.rol.observaciones: pedido.rol.observaciones.toLowerCase(),
+        pedido.pedido.estado.toLowerCase(),
+        pedido.pedido.periodicidad.toLowerCase(),
+      ];
+
+      if(pedidoArray.includes(filtro)){
+        results.push(pedido);
+        continue;
+      }
+      let entregasMatch = [];
+      for(let j = 0; j < pedido.entregas.length; j ++){
+        let entrega = JSON.parse(JSON.stringify(pedido.entregas[j]));
+        let entregaArray = [
+          entrega.id.toString(),
+          entrega.estado,
+          entrega.fecha_de_entrega_potencial,
+          entrega.fecha_de_procesamiento_real
+        ];
+        console.log(entregaArray)
+        console.log(filtro)
+        if(entregaArray.includes(filtro)){
+          console.log("entrega match")
+          entregasMatch.push(entrega);
         }
       }
-      if(isMatch){
-        results.push(objGlobal);
+      if(pedido.entregas.length != 0){
+        pedido.entregas = entregasMatch;
+        results.push(pedido);
       }
-    });
+    }
 
     return results;
   }

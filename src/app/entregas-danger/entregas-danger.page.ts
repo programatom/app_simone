@@ -11,7 +11,7 @@ import { ObjEntrega } from 'src/interfaces/interfaces';
 export class EntregasDangerPage implements OnInit {
 
   entregasDanger = [];
-  entregasDangerDisplay = [];
+  pedidosDangerDisplay = [];
 
   constructor(private navCtrl: NavController,
               private entregasLogic: EntregasLogicService,
@@ -19,7 +19,8 @@ export class EntregasDangerPage implements OnInit {
 
   ngOnInit() {
     this.entregasDanger = this.entregasLogic.arrayEntregasSeleccionado;
-    this.entregasDangerDisplay = JSON.parse(JSON.stringify(this.entregasDanger));
+    console.log(this.entregasDanger);
+    this.pedidosDangerDisplay = JSON.parse(JSON.stringify(this.entregasDanger));
   }
 
   dismiss(){
@@ -33,22 +34,21 @@ export class EntregasDangerPage implements OnInit {
     // En cada elemento del array, sacar las keys de cada obj e iterar esas keys
     let searchKeys = ["nombre" , "user_id", "localidad" , "calle", "role", "observaciones" , "estado"];
     let results = this.commonServ.filtroArrayObjsOfObjs(this.entregasDanger, filtro, searchKeys);
-    this.entregasDangerDisplay = results;
+    this.pedidosDangerDisplay = results;
   }
 
-  entregarSinModificaciones(entrega:ObjEntrega, index){
-    this.entregasLogic.entregarSinModificaciones(entrega).then(()=>{
-      this.entregasDanger.splice(index, 1);
-      this.entregasDangerDisplay.splice(index, 1);
-    })
-
+  verInfo(pedido, index_entrega){
+    this.entregasLogic.verInfoPedido(pedido,index_entrega)
   }
 
-  modificar(entrega){
-    this.entregasLogic.entregaSeleccionada = entrega;
-    this.entregasLogic.modificarPedidoDismissUrl = "/entregas-danger";
-    this.entregasLogic.isScheduled = true;
-    this.navCtrl.navigateForward("/modificar-pedido");
+  entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
+    this.entregasLogic.entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, this.pedidosDangerDisplay)
+                      .then(()=>{
+                      });
+  }
+
+  modificar(pedido, index_entrega){
+    this.entregasLogic.modificarEntrega(pedido, index_entrega);
   }
 
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { EntregasLogicService, EntregasHttpService, CommonService } from '../services/services.index';
-import { NavController } from '@ionic/angular';
 import { ObjEntrega } from 'src/interfaces/interfaces';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-alarma-derivadas',
@@ -11,13 +11,26 @@ import { ObjEntrega } from 'src/interfaces/interfaces';
 export class AlarmaDerivadasPage implements OnInit {
 
   entregas = [];
-  entregasDisplay = [];
-
+  pedidosDisplay = [];
+  pedidosTotales = [];
   constructor(private entregasLogic: EntregasLogicService,
               private entregasHttp: EntregasHttpService,
-              private navCtrl: NavController,
-              private commonServ: CommonService) { }
-
+              private commonServ: CommonService,
+              private router: Router) {
+                this.routeEvent(this.router);
+              }
+  routeEvent(router: Router){
+    router.events.subscribe(e => {
+      if(e instanceof NavigationEnd){
+        if(e.url == "/tabs/alarma-derivadas"){
+          if(this.entregasLogic.entregaModificadaYProcesada){
+            this.inicializarEntregasAMostrar();
+            this.entregasLogic.entregaModificadaYProcesada = false;
+          }
+        }
+      }
+    });
+  }
   ngOnInit() {
     this.inicializarEntregasAMostrar();
   }
@@ -30,41 +43,45 @@ export class AlarmaDerivadasPage implements OnInit {
   async inicializarEntregasAMostrar(){
     this.entregasHttp.getEntregasAlarmaYDerivadas().subscribe((respuesta:any)=>{
       console.log(respuesta);
-      let entregasDerivadas = this.entregasLogic.filtrarEntregas(respuesta.data,[0],[1],["sin procesar"],[respuesta.nombre_empleado]);
-      let entregasConAlarma = this.entregasLogic.filtrarEntregas(respuesta.data,[0],[0],["sin procesar"],[],[1]);
-      console.log(entregasConAlarma);
-      let concat = entregasDerivadas.concat(entregasConAlarma);
+      // Aca me llegan los pedidos con (habitual y alarma) y excepcional de este usuario.
+      // Yo de esto quiero las entregas que no están procesadas y las derivadas de las excepcionales.
+
+      let entregasDerivadas = this.entregasLogic.filtrarEntregas(respuesta.data.excepcionales,[0],[1],["sin procesar"],[respuesta.id_empleado]);
+      let pedidosConAlarma = this.entregasLogic.filtrarEntregas(respuesta.data.habituales_alarma,[0],[0],["sin procesar"],[],[1]);
+      let concat = entregasDerivadas.concat(pedidosConAlarma);
+      console.log(pedidosConAlarma);
+      console.log(entregasDerivadas);
       if(concat.length > 20){
         concat = concat.splice(0, 20);
+        this.pedidosTotales = concat;
       }
-      this.entregas = concat;
-      this.entregasDisplay = JSON.parse(JSON.stringify(this.entregas));
+      this.pedidosDisplay = JSON.parse(JSON.stringify(concat));
+      this.pedidosTotales = concat;
       return;
     });
   }
 
-  entregarSinModificaciones(entrega:ObjEntrega, index){
-    this.entregasLogic.entregarSinModificaciones(entrega).then(()=>{
-      this.entregas.splice(index, 1);
-      this.entregasDisplay.splice(index, 1);
-    });
+  entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
+    this.entregasLogic.entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, this.pedidosDisplay)
+                      .then(()=>{
+
+                      });
   }
 
-  modificar(entrega){
-    this.entregasLogic.entregaSeleccionada = entrega;
-    this.entregasLogic.modificarPedidoDismissUrl = "/tabs/alarma-derivadas";
-    this.entregasLogic.isScheduled = true;
-    this.navCtrl.navigateForward("/modificar-pedido");
+  modificar(pedido, index_entrega){
+    this.entregasLogic.modificarEntrega(pedido, index_entrega);
+  }
+
+  verInfo(pedido, index_entrega){
+    this.entregasLogic.verInfoPedido(pedido,index_entrega);
   }
 
   filtrarEntregas(event){
     let filtro = event.detail.value;
 
-    // ARRAY    OBJs   ENTREGA obj  PEDIDO obj USUARIO ROL obj
-    // En cada elemento del array, sacar las keys de cada obj e iterar esas keys
-    let searchKeys = ["nombre" , "user_id", "localidad" , "calle", "role", "observaciones" , "estado"];
-    let results = this.commonServ.filtroArrayObjsOfObjs(this.entregas, filtro, searchKeys);
-    this.entregasDisplay = results;
+    let pedidosCopy = JSON.parse(JSON.stringify(this.pedidosTotales));
+    let results = this.commonServ.filtroArrayObjsOfObjs(pedidosCopy, filtro);
+    this.pedidosDisplay = results;
   }
 
 }

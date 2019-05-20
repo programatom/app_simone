@@ -175,11 +175,19 @@
     </ion-col>
     <ion-col text-center size="12">
       <strong>
+        Fecha de expiración:
+      </strong>
+    </ion-col>
+    <ion-col text-center size="12">
+      {{pedido.pedido.expiracion_descuento}}
+    </ion-col>
+    <ion-col text-center size="12">
+      <strong>
         Dia de entrega:
       </strong>
     </ion-col>
     <ion-col text-center size="12">
-      {{pedido.pedido.dia_de_entrega}}
+      {{pedido.pedido.dia_de_entrega| dia}}
     </ion-col>
     <ion-col text-center size="12">
       <strong>

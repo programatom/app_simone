@@ -6,6 +6,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { AlarmaDerivadasPage } from './alarma-derivadas.page';
+import { EmpleadoPipe } from '../pipes/empleado.pipe';
+import { PipesModule } from '../pipes/pipes.module';
+import { DiaPipe } from '../pipes/dia.pipe';
 
 const routes: Routes = [
   {
@@ -19,8 +22,11 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    PipesModule
+
   ],
-  declarations: [AlarmaDerivadasPage]
+  declarations: [AlarmaDerivadasPage],
+  providers:[EmpleadoPipe,DiaPipe]
 })
 export class AlarmaDerivadasPageModule {}

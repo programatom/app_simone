@@ -11,6 +11,11 @@ export class PedidosService {
 
   constructor(private http: HttpService) { }
 
+  getEmpleados(){
+    let url = URL_SERVICES + "empleados";
+    return this.http.httpGet(url);
+  }
+
   getPedidos(){
     let url = URL_SERVICES + "pedidosEmpleado";
     return this.http.httpGet(url);
