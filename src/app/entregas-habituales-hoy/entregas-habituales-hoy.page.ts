@@ -21,7 +21,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
               private entregasLogic: EntregasLogicService,
               private navCtrl: NavController,
               private toastServ: ToastService,
-              private commonServ: CommonService,
+              public commonServ: CommonService,
               private router: Router) {
                 this.routeEvent(this.router);
 
@@ -119,7 +119,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
       {
         text:"Aceptar",
         handler:()=>{
-          this.entregasLogic.linkEntregaSelectedForNavigation(pedido,index_entrega);
+          this.entregasLogic.linkPedidoWithOneEntrega(pedido,index_entrega);
 
           this.entregasLogic.entregaAReintentarODerivar(this.entregasLogic.pedidoSeleccionado,0,1,"").then((respuesta)=>{
             this.pedidosDisplay[index_pedido].entregas.splice(index_entrega, 1);

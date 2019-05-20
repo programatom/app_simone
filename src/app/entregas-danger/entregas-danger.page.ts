@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { EntregasLogicService, CommonService } from '../services/services.index';
 import { ObjEntrega } from 'src/interfaces/interfaces';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-entregas-danger',
@@ -12,14 +13,30 @@ export class EntregasDangerPage implements OnInit {
 
   entregasDanger = [];
   pedidosDangerDisplay = [];
-
+  pedidosTotales = [];
   constructor(private navCtrl: NavController,
               private entregasLogic: EntregasLogicService,
-              private commonServ: CommonService) { }
+              private commonServ: CommonService,
+              private router: Router) {
+
+              }
+    routeEvent(router: Router){
+      router.events.subscribe(e => {
+        if(e instanceof NavigationEnd){
+          if(e.url == "/tabs/entregas-danger"){
+            if(this.entregasLogic.entregaModificadaYProcesada){
+
+              this.entregasLogic.entregaModificadaYProcesada = false;
+            }
+          }
+        }
+      });
+    }
 
   ngOnInit() {
     this.entregasDanger = this.entregasLogic.arrayEntregasSeleccionado;
     console.log(this.entregasDanger);
+    this.pedidosTotales = JSON.parse(JSON.stringify(this.entregasDanger));
     this.pedidosDangerDisplay = JSON.parse(JSON.stringify(this.entregasDanger));
   }
 
@@ -29,11 +46,8 @@ export class EntregasDangerPage implements OnInit {
 
   filtrarEntregas(event){
     let filtro = event.detail.value;
-
-    // ARRAY    OBJs   ENTREGA obj  PEDIDO obj USUARIO ROL obj
-    // En cada elemento del array, sacar las keys de cada obj e iterar esas keys
-    let searchKeys = ["nombre" , "user_id", "localidad" , "calle", "role", "observaciones" , "estado"];
-    let results = this.commonServ.filtroArrayObjsOfObjs(this.entregasDanger, filtro, searchKeys);
+    let pedidosCopy = JSON.parse(JSON.stringify(this.pedidosTotales));
+    let results = this.commonServ.filtroArrayObjsOfObjs(pedidosCopy, filtro);
     this.pedidosDangerDisplay = results;
   }
 
@@ -44,6 +58,7 @@ export class EntregasDangerPage implements OnInit {
   entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
     this.entregasLogic.entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, this.pedidosDangerDisplay)
                       .then(()=>{
+
                       });
   }
 

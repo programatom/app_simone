@@ -47,7 +47,7 @@ export class AlarmaDerivadasPage implements OnInit {
       // Yo de esto quiero las entregas que no están procesadas y las derivadas de las excepcionales.
 
       let entregasDerivadas = this.entregasLogic.filtrarEntregas(respuesta.data.excepcionales,[0],[1],["sin procesar"],[respuesta.id_empleado]);
-      let pedidosConAlarma = this.entregasLogic.filtrarEntregas(respuesta.data.habituales_alarma,[0],[0],["sin procesar"],[],[1]);
+      let pedidosConAlarma = this.entregasLogic.filtrarEntregas(respuesta.data.habituales_alarma,[0, 1],[0],["sin procesar"],[],[1]);
       let concat = entregasDerivadas.concat(pedidosConAlarma);
       console.log(pedidosConAlarma);
       console.log(entregasDerivadas);

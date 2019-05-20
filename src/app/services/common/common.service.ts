@@ -8,8 +8,14 @@ export class CommonService {
   constructor() { }
 
   hoy(){
-    let hoy = new Date();
+    // PROD
+    //let hoy = new Date();
 
+    // TEST
+
+    var hoy = new Date();
+    hoy.setDate(hoy.getDate() + 7);
+    console.log(hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate()));
     return hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
   }
 
@@ -72,7 +78,6 @@ export class CommonService {
         console.log(entregaArray)
         console.log(filtro)
         if(entregaArray.includes(filtro)){
-          console.log("entrega match")
           entregasMatch.push(entrega);
         }
       }

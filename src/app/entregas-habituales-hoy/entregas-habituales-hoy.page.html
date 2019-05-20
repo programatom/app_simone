@@ -1,6 +1,6 @@
 <ion-header>
     <ion-toolbar>
-        <ion-title>Entregas habituales de hoy</ion-title>
+        <ion-title>Entregas de habituales: {{commonServ.hoy() }}</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="irADanger()">
             <ion-icon slot="icon-only" [name]="danger.length > 0? 'alert':'checkmark-circle'" [color]="danger.length > 0? 'danger':'success'"></ion-icon>

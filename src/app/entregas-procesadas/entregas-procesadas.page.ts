@@ -149,7 +149,7 @@ export class EntregasProcesadasPage implements OnInit {
  }
 
  entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
-   this.linkEntregaSelectedForNavigation(pedido, index_entrega);
+   this.linkPedidoWithOneEntrega(pedido, index_entrega);
    this.entregasLogic.entregarSinModificaciones(pedido).then(()=>{
      this.pedidosDisplay[index_pedido].entregas.splice(index_entrega, 1);
    });
@@ -157,7 +157,7 @@ export class EntregasProcesadasPage implements OnInit {
 
 
  verInfo(pedido, index_entrega){
-   this.linkEntregaSelectedForNavigation(pedido, index_entrega);
+   this.linkPedidoWithOneEntrega(pedido, index_entrega);
    this.entregasLogic.infoPedidoDismissUrl = "/tabs/entregas-procesadas";
    this.navCtrl.navigateForward("/tabs/info-pedido");
  }
@@ -174,7 +174,7 @@ export class EntregasProcesadasPage implements OnInit {
    }
  }
 
- linkEntregaSelectedForNavigation(pedido, index_entrega){
+ linkPedidoWithOneEntrega(pedido, index_entrega){
    this.entregasLogic.pedidoSeleccionado = JSON.parse(JSON.stringify(pedido));
    this.entregasLogic.pedidoSeleccionado.entregas = pedido.entregas[index_entrega];
    return;
@@ -183,22 +183,18 @@ export class EntregasProcesadasPage implements OnInit {
  modificar(pedido, index_entrega){
    console.log(pedido)
    this.filtroAdelantadas(pedido.entregas[index_entrega]);
-   this.linkEntregaSelectedForNavigation(pedido, index_entrega);
+   this.linkPedidoWithOneEntrega(pedido, index_entrega);
    this.entregasLogic.modificarPedidoDismissUrl = "/tabs/entregas-procesadas";
    this.entregasLogic.isScheduled = true;
    this.navCtrl.navigateForward("/modificar-pedido");
  }
 
  ionViewWillEnter(){
-   console.log("asd")
    if(this.entregasLogic.entregaModificadaYProcesada){
      this.entregasLogic.entregaModificadaYProcesada = false;
-     console.log("Se modifico una entrgga")
      if(this.isHoyScreen){
-       console.log("Se reestablece la pantalla de hoy")
        this.buscarFechaDeHoyYInicializarPantalla();
      }else{
-       console.log("Se reestablece la pantalla de disintas de hoy")
        this.buscarEntregasDistintasAHoy();
      }
    }

@@ -4,6 +4,7 @@ import { map } from "rxjs/operators"
 import { Observable } from 'rxjs';
 import { ObjRespuestaServidor } from 'src/interfaces/interfaces';
 import { LocalStorageService } from './local-storage/local-storage.service';
+import { NavController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ import { LocalStorageService } from './local-storage/local-storage.service';
 export class HttpService {
   token:string;
   constructor(private http: HttpClient,
-              private localStorageServ: LocalStorageService) {
+              private localStorageServ: LocalStorageService,
+              private navCtrl: NavController) {
   }
   httpGet(url: string): Observable<ObjRespuestaServidor> {
     this.token = this.localStorageServ.localStorageObj.token;
@@ -27,6 +29,7 @@ export class HttpService {
     return this.http.get(url, requestOptions)
       .pipe(
         map((respuesta: any) => {
+          this.unauthorized(respuesta);
           return respuesta;
         })
       );
@@ -57,46 +60,21 @@ export class HttpService {
     return this.http.post(url, data ,requestOptions)
       .pipe(
         map((respuesta: any) => {
+          this.unauthorized(respuesta);
           return respuesta;
         })
       );
   }
 
-  httpPut(url: string, data:any, content_type?:string): Observable<ObjRespuestaServidor> {
-    this.token = this.localStorageServ.localStorageObj.token;
-    var headerDict;
+  unauthorized(respuesta){
+    if(respuesta.status == "unauthorized"){
+      console.log("voy aca")
+      this.localStorageServ.eliminateAllValuesInStorage().then(()=>{
+        this.navCtrl.navigateRoot("/login");
+      });
 
-    if(this.token == undefined){
-      headerDict = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      }
-    }else if(content_type == "file"){
-      headerDict = {
-        'Content-Type': 'multipart/form-data',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + this.token,
-      }
     }else{
-      headerDict = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + this.token,
-      }
-
+      return;
     }
-
-    const requestOptions = {
-      headers: new HttpHeaders(headerDict),
-    };
-
-    console.log(url, data ,requestOptions)
-
-    return this.http.put(url, data ,requestOptions)
-      .pipe(
-        map((respuesta: any) => {
-          return respuesta;
-        })
-      );
   }
 }

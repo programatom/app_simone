@@ -27,21 +27,21 @@ export class EntregasLogicService {
         private commonServ: CommonService) { }
 
 
-    linkEntregaSelectedForNavigation(pedido, index_entrega){
+    linkPedidoWithOneEntrega(pedido, index_entrega){
       this.pedidoSeleccionado = JSON.parse(JSON.stringify(pedido));
       this.pedidoSeleccionado.entregas = pedido.entregas[index_entrega];
       return;
     }
 
     verInfoPedido(pedido,index_entrega){
-      this.linkEntregaSelectedForNavigation(pedido,index_entrega);
+      this.linkPedidoWithOneEntrega(pedido,index_entrega);
       this.infoPedidoDismissUrl = this.router.url;
       this.navCtrl.navigateForward("/tabs/info-pedido");
     }
 
 
     modificarEntrega(pedido, index_entrega, isScheduled = true){
-      this.linkEntregaSelectedForNavigation(pedido,index_entrega);
+      this.linkPedidoWithOneEntrega(pedido,index_entrega);
       this.modificarPedidoDismissUrl = this.router.url;
       this.isScheduled = isScheduled;
       this.navCtrl.navigateForward("/modificar-pedido");
@@ -49,9 +49,9 @@ export class EntregasLogicService {
 
 
 
-    entregasSinModifYSpliceLista(pedido, index_entrega, index_pedido, displayList){
+    entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, displayList){
       return new Promise((resolve)=>{
-        this.linkEntregaSelectedForNavigation(pedido, index_entrega);
+        this.linkPedidoWithOneEntrega(pedido, index_entrega);
         this.entregarSinModificaciones(this.pedidoSeleccionado).then(()=>{
           displayList[index_pedido].entregas.splice(index_entrega , 1);
           resolve();
@@ -72,6 +72,7 @@ export class EntregasLogicService {
                 {
                     text: "Aceptar",
                     handler: () => {
+
                         this.procesar(pedido, pedido.entregas.productos, "Entregada sin modificaciones", "entregada", 0).then((respuesta) => {
                             resolve()
                         });
@@ -139,8 +140,9 @@ export class EntregasLogicService {
             peticion.data.estado = estado;
             peticion.data.observaciones = observaciones;
             peticion.data.entregas_adelantadas = entregas_adelantadas;
-
+            console.log(entregas_adelantadas)
             if (entregas_adelantadas > 0) {
+              peticion.data.observaciones = peticion.data.observaciones +  ". Mensaje del sistema: entrega adelanta " + entregas_adelantadas + " entregas";
                 peticion.data.adelanta = 1;
             } else {
                 peticion.data.adelanta = 0;
@@ -204,8 +206,10 @@ export class EntregasLogicService {
               && alarma.includes(pedido.alarma)
               && danger.includes(pedido.danger)
             ) {
-              console.log("Se encontró una entrega congruente: " , entrega);
+              console.log("Se encontró una entrega congruente: " , JSON.parse(JSON.stringify(entrega)));
               entregas_a_mostrar.push(entrega);
+            }else{
+              console.log("Se descarta: " , JSON.parse(JSON.stringify(entrega)));
             }
             }
             value.entregas = entregas_a_mostrar;
