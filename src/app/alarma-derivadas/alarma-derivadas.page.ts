@@ -24,7 +24,7 @@ export class AlarmaDerivadasPage implements OnInit {
       if(e instanceof NavigationEnd){
         if(e.url == "/tabs/alarma-derivadas"){
           if(this.entregasLogic.entregaModificadaYProcesada){
-            this.inicializarEntregasAMostrar();
+            //this.inicializarEntregasAMostrar();
             this.entregasLogic.entregaModificadaYProcesada = false;
           }
         }
@@ -68,8 +68,11 @@ export class AlarmaDerivadasPage implements OnInit {
                       });
   }
 
-  modificar(pedido, index_entrega){
-    this.entregasLogic.modificarEntrega(pedido, index_entrega);
+  modificar(pedido, index_pedido, index_entrega){
+    this.entregasLogic.previousDisplayObjArray.index_pedido = index_pedido;
+    this.entregasLogic.previousDisplayObjArray.index_pedido = index_entrega;
+    this.entregasLogic.previousDisplayObjArray.array = this.pedidosDisplay;
+    this.entregasLogic.modificarEntrega(pedido, index_pedido);
   }
 
   verInfo(pedido, index_entrega){

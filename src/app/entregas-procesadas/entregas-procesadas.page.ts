@@ -180,13 +180,11 @@ export class EntregasProcesadasPage implements OnInit {
    return;
  }
 
- modificar(pedido, index_entrega){
-   console.log(pedido)
-   this.filtroAdelantadas(pedido.entregas[index_entrega]);
-   this.linkPedidoWithOneEntrega(pedido, index_entrega);
-   this.entregasLogic.modificarPedidoDismissUrl = "/tabs/entregas-procesadas";
-   this.entregasLogic.isScheduled = true;
-   this.navCtrl.navigateForward("/modificar-pedido");
+ modificar(pedido, index_pedido, index_entrega){
+
+   this.entregasLogic.previousDisplayObjArray.has_to_eliminate = false;
+
+   this.entregasLogic.modificarEntrega(pedido, index_pedido);
  }
 
  ionViewWillEnter(){

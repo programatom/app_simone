@@ -11,12 +11,23 @@ import { CommonService } from '../common/common.service';
 })
 export class EntregasLogicService {
 
+    // Arrays de navegación
     pedidoSeleccionado = {} as ObjEntrega;
-    arrayEntregasSeleccionado:Array<ObjEntrega> = [];
-    entregaModificadaYProcesada = false;
+    arrayPedidosEnPeligro:Array<ObjEntrega> = [];
     productos = [];
+    danger = [];
+    previousDisplayObjArray = {
+      "index_entrega" : 0,
+      "index_pedido": 0,
+      "array": [],
+      "has_to_eliminate": true
+    };
 
+    // Variables booleanas
+    entregaModificadaYProcesada = false;
     isScheduled = true;
+
+    // Navegación
     modificarPedidoDismissUrl = "";
     infoPedidoDismissUrl = "";
 
@@ -126,7 +137,8 @@ export class EntregasLogicService {
     }
 
     procesar(pedido, productosEntregados, observaciones, estado, entregas_adelantadas, pagaCon?) {
-        return new Promise((resolve) => {
+
+        return new Promise((resolve, reject) => {
             let peticion = new Object() as ObjProcesamientoEntrega;
 
             if(!this.isScheduled){
@@ -158,10 +170,22 @@ export class EntregasLogicService {
 
             peticion.data.productos_entregados = productosEntregados;
 
-            console.log("SE ENVÍA LA PETICÓN: ", peticion)
+            console.log("SE ENVÍA LA PETICÓN: ", peticion);
+
+
+
             this.entregasHttp.procesarEntrega(peticion).subscribe((respuesta) => {
-                this.toastServ.presentToast("Se procesó la entrega con éxito" , "success")
-                console.log(respuesta);
+                if(respuesta.status == "fail"){
+                  this.toastServ.presentToast(respuesta.message);
+                  reject();
+                }else{
+                  this.toastServ.presentToast("Se procesó la entrega con éxito" , "success");
+                  if(this.previousDisplayObjArray.has_to_eliminate){
+                    this.previousDisplayObjArray.array[this.previousDisplayObjArray.index_pedido].entregas.splice(this.previousDisplayObjArray.index_entrega, 1);
+                  }else{
+                    this.previousDisplayObjArray.has_to_eliminate = true;
+                  }
+                }
                 resolve(respuesta);
             });
         });

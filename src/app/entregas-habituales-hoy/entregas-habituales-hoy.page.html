@@ -1,10 +1,10 @@
 <ion-header>
     <ion-toolbar>
-        <ion-title>Entregas de habituales: {{commonServ.hoy() }}</ion-title>
+        <ion-title>Entregas de habituales: <br> {{commonServ.hoy() }}</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="irADanger()">
-            <ion-icon slot="icon-only" [name]="danger.length > 0? 'alert':'checkmark-circle'" [color]="danger.length > 0? 'danger':'success'"></ion-icon>
-            <ion-badge color="dark" *ngIf="danger.length > 0">{{danger.length}}</ion-badge>
+            <ion-icon slot="icon-only" [name]="entregasLogic.danger.length > 0? 'alert':'checkmark-circle'" [color]="entregasLogic.danger.length > 0? 'danger':'success'"></ion-icon>
+            <ion-badge color="dark" *ngIf="entregasLogic.danger.length > 0">{{entregasLogic.danger.length}}</ion-badge>
           </ion-button>
         </ion-buttons>
     </ion-toolbar>
@@ -60,7 +60,7 @@
           </ion-item>
 
           <ion-item-options side="end">
-            <ion-item-option color="secondary" (click)="modificar(pedido, index_entrega)">Modificar</ion-item-option>
+            <ion-item-option color="secondary" (click)="modificar(pedido, index_pedido, index_entrega)">Modificar</ion-item-option>
             <ion-item-option color="success" (click)="entregarSinModificaciones(pedido , index_pedido, index_entrega)">Entregar</ion-item-option>
           </ion-item-options>
         </ion-item-sliding>

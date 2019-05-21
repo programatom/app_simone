@@ -11,8 +11,7 @@ import { Router, NavigationEnd } from '@angular/router';
 })
 export class EntregasDangerPage implements OnInit {
 
-  entregasDanger = [];
-  pedidosDangerDisplay = [];
+  pedidosDisplay = [];
   pedidosTotales = [];
   constructor(private navCtrl: NavController,
               private entregasLogic: EntregasLogicService,
@@ -34,10 +33,8 @@ export class EntregasDangerPage implements OnInit {
     }
 
   ngOnInit() {
-    this.entregasDanger = this.entregasLogic.arrayEntregasSeleccionado;
-    console.log(this.entregasDanger);
-    this.pedidosTotales = JSON.parse(JSON.stringify(this.entregasDanger));
-    this.pedidosDangerDisplay = JSON.parse(JSON.stringify(this.entregasDanger));
+    this.pedidosTotales = JSON.parse(JSON.stringify(this.entregasLogic.arrayPedidosEnPeligro));
+    this.pedidosDisplay = JSON.parse(JSON.stringify(this.entregasLogic.arrayPedidosEnPeligro));
   }
 
   dismiss(){
@@ -48,7 +45,7 @@ export class EntregasDangerPage implements OnInit {
     let filtro = event.detail.value;
     let pedidosCopy = JSON.parse(JSON.stringify(this.pedidosTotales));
     let results = this.commonServ.filtroArrayObjsOfObjs(pedidosCopy, filtro);
-    this.pedidosDangerDisplay = results;
+    this.pedidosDisplay = results;
   }
 
   verInfo(pedido, index_entrega){
@@ -56,14 +53,23 @@ export class EntregasDangerPage implements OnInit {
   }
 
   entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
-    this.entregasLogic.entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, this.pedidosDangerDisplay)
+
+    this.entregasLogic.entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, this.pedidosDisplay)
                       .then(()=>{
+                        let id_entrega = pedido.entregas.id;
+                        let index_entrega_in_danger_array = this.entregasLogic.danger.findIndex((value)=> value.id == id_entrega);
+                        this.entregasLogic.danger.splice(index_entrega_in_danger_array , 1);
+                        this.entregasLogic.arrayPedidosEnPeligro[index_pedido].entregas.splice(index_entrega, 1);
+
 
                       });
   }
 
-  modificar(pedido, index_entrega){
-    this.entregasLogic.modificarEntrega(pedido, index_entrega);
+  modificar(pedido, index_pedido, index_entrega){
+    this.entregasLogic.previousDisplayObjArray.index_pedido = index_pedido;
+    this.entregasLogic.previousDisplayObjArray.index_pedido = index_entrega;
+    this.entregasLogic.previousDisplayObjArray.array = this.pedidosDisplay;
+    this.entregasLogic.modificarEntrega(pedido, index_pedido);
   }
 
 }

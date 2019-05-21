@@ -15,10 +15,8 @@ export class EntregasHabitualesHoyPage implements OnInit {
   pedidosTotales = [];
   pedidosDisplay = [];
 
-  danger = [];
-
   constructor(private entregasHttp: EntregasHttpService,
-              private entregasLogic: EntregasLogicService,
+              public entregasLogic: EntregasLogicService,
               private navCtrl: NavController,
               private toastServ: ToastService,
               public commonServ: CommonService,
@@ -46,7 +44,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
   }
 
   irADanger(){
-    if(this.danger.length == 0){
+    if(this.entregasLogic.danger.length == 0){
       this.toastServ.presentToast("No hay entregas en estado de peligro!");
       return;
     }
@@ -56,28 +54,34 @@ export class EntregasHabitualesHoyPage implements OnInit {
 
   buscarEntregasDanger(){
     this.entregasHttp.getEntregasDanger().subscribe((respuesta:any)=>{
+      console.log(JSON.parse(JSON.stringify(respuesta)));
       let pedidos = respuesta.data;
-      console.log(respuesta);
       let entregasEnPeligro = [];
+      let pedidosEnPeligro = [];
 
       for (let i = 0; i < pedidos.length; i ++){
+
         let dangerNotFoundInPedido = true;
-        let entregas = pedidos[i].entregas;
+        let entregas = JSON.parse(JSON.stringify(pedidos[i].entregas));
+
         for(let j = 0; j < entregas.length; j ++){
           let entrega = entregas[j];
-          if(entrega.estado == "sin procesar" && entrega.out_of_schedule == "0"){
+          console.log("Itera las entregas del pedido: " + pedidos[i].pedido.id);
+          console.log(entrega.estado ,  entrega.out_of_schedule, entrega.id)
+          if(entrega.estado == "sin procesar" && entrega.out_of_schedule == 0){
             dangerNotFoundInPedido = false;
             entregasEnPeligro.push(entrega);
             pedidos[i].entregas = [];
             pedidos[i].entregas.push(entrega);
           }
         }
-        if(dangerNotFoundInPedido){
-          pedidos.splice(i, 1);
+        if(!dangerNotFoundInPedido){
+          pedidosEnPeligro.push(pedidos[i]);
         }
       }
-      this.entregasLogic.arrayEntregasSeleccionado = pedidos;
-      this.danger = entregasEnPeligro;
+
+      this.entregasLogic.arrayPedidosEnPeligro = pedidosEnPeligro;
+      this.entregasLogic.danger = entregasEnPeligro;
     });
   }
 
@@ -139,9 +143,11 @@ export class EntregasHabitualesHoyPage implements OnInit {
                       });
   }
 
-  modificar(pedido, index_entrega){
-    this.entregasLogic.modificarEntrega(pedido, index_entrega);
+  modificar(pedido, index_pedido, index_entrega){
+    this.entregasLogic.previousDisplayObjArray.index_pedido = index_pedido;
+    this.entregasLogic.previousDisplayObjArray.index_pedido = index_entrega;
+    this.entregasLogic.previousDisplayObjArray.array = this.pedidosDisplay;
+    this.entregasLogic.modificarEntrega(pedido, index_pedido);
   }
-
 
 }

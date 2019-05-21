@@ -21,6 +21,7 @@ export class ModificarPedidoPage implements OnInit {
   observaciones = "";
   entregasAdelantadas:number = 0;
   descuento = 0;
+  productoSeleccionado;
 
   constructor(public entregasLogic: EntregasLogicService,
               private navCtrl: NavController,
@@ -37,22 +38,16 @@ export class ModificarPedidoPage implements OnInit {
   }
 
   ionViewWillEnter(){
-    if(this.entregasLogic.isScheduled){
-      this.scheduledLogic();
-    }else{
-      this.newUnscheduledLogic();
-    }
-
-  }
-
-  newUnscheduledLogic(){
     this.pedido = this.entregasLogic.pedidoSeleccionado;
     this.productosDeLaEmpresa = this.entregasLogic.productos;
+
+    if(this.pedido.entregas.out_of_schedule == 0){
+      this.scheduledLogic();
+    }
   }
 
   scheduledLogic(){
 
-    this.pedido = this.entregasLogic.pedidoSeleccionado;
     this.descuento = this.pedido.pedido.descuento;
     this.observaciones = this.pedido.entregas.observaciones;
     this.montoAPagar = this.entregasLogic.calcularMontoAPagar(this.pedido.entregas.productos, this.descuento,this.pedido.pedido.expiracion_descuento);
@@ -115,34 +110,16 @@ export class ModificarPedidoPage implements OnInit {
       {
         text:"Aceptar",
         handler:()=>{
+          // En este punto, al procesarse una entrega, se debería sacar la entrega
+          // del display de la pantalla anterior. Debería generar una variable en el
+          // servicio logico para tratarlo.
+
           this.entregasLogic.procesar(this.pedido, [], this.observaciones, "cancelada",0,0).then((respuesta)=>{
             this.entregasLogic.entregaModificadaYProcesada = true;
             this.dismiss();
-          });
-        }
-      }
-    ];
-    this.toastServ.presentAlert(header, undefined, undefined, buttons);
-  }
-
-  derivar(){
-    if(this.fieldValidation() != true){
-      this.toastServ.presentToast("El campo: " + this.fieldValidation() + " es requerido");
-      return;
-    };
-    let header = "Derivar entrega";
-    let buttons = [
-      {
-        text:"Cancelar",
-        role:"cancel"
-      },
-      {
-        text:"Aceptar",
-        handler:()=>{
-          this.entregasLogic.entregaAReintentarODerivar(this.pedido, 1, 0, this.observaciones).then((respuesta)=>{
-            this.entregasLogic.entregaModificadaYProcesada = true;
-            this.dismiss();
-          });
+          }).catch((err) => {
+            console.log("No se pudo procesar la entrega")
+          });;
         }
       }
     ];
@@ -166,21 +143,42 @@ export class ModificarPedidoPage implements OnInit {
           this.entregasLogic.procesar(this.pedido, this.productos, this.observaciones, "entregada",this.entregasAdelantadas,this.pagaCon).then((respuesta)=>{
             this.entregasLogic.entregaModificadaYProcesada = true;
             this.dismiss();
-          });
+          }).catch((err) => {
+            console.log("No se pudo procesar la entrega")
+          });;
         }
       }
     ];
     this.toastServ.presentAlert(header, undefined, undefined, buttons);
   }
 
-  seleccionProducto(evento){
-    let producto = evento.detail.value;
-    this.productos.push({
-      "nombre":producto.nombre,
-      "precio":producto.precio,
-      "cantidad":1,
-      "id":producto.id
-    });
-    this.actualizarDatosDePago();
+  seleccionProducto(evento, button = "false"){
+    console.log(this.productoSeleccionado)
+    if(this.productoSeleccionado == undefined){
+      this.toastServ.presentToast("Elija un producto");
+      return;
+    }
+    var producto;
+    if(button == "false"){
+      producto = evento.detail.value;
+    }else{
+      producto = this.productoSeleccionado;
+    }
+
+    if(this.productos.filter((value)=>
+      value.id == producto.id
+    ).length > 0){
+      this.toastServ.presentToast("Ya se ingresó éste producto");
+      return;
+    }else{
+      this.productos.push({
+        "nombre":producto.nombre,
+        "precio":producto.precio,
+        "cantidad":1,
+        "id":producto.id
+      });
+      this.actualizarDatosDePago();
+
+    }
   }
 }

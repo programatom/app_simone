@@ -1,6 +1,7 @@
 export interface ObjRespuestaServidor {
   status:string,
-  data:any
+  data:any,
+  message:string
 };
 
 export interface ObjLocalStorage{

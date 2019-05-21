@@ -36,33 +36,33 @@
           </ion-col>
         </div>
 
-        <ion-row class="justify-content-center">
-          <ion-col>
+        <ion-col size="12">
 
-            <ion-item color="primary" lines="none" text-wrap *ngFor="let producto of productos; let i = index">
-              <ion-buttons slot="end">
-                <ion-icon style="font-size: 8vw" name="close-circle" (click)="eliminar(i)" color="light" item-end>
-                </ion-icon>
-                <ion-icon style="font-size: 8vw" name="add-circle" (click)="agregar(i)" color="light" item-end>
-                </ion-icon>
-              </ion-buttons>
-              <ion-text class="text-light">
-                <strong style="font-size:6vw;"> {{producto.cantidad}} </strong> | {{producto.nombre}} <strong>$ {{producto.precio}} c/u</strong>
-              </ion-text>
-            </ion-item>
-            <ion-row>
-              <ion-col size="12">
-                <ion-item>
-                  <ion-label>Productos</ion-label>
-                  <ion-select interface="alert" multiple="false" placeholder="Elija un producto" (ionChange)="seleccionProducto($event)">
-                    <ion-select-option [value]="producto" *ngFor="let producto of productosDeLaEmpresa">{{producto.nombre}}</ion-select-option>
-                  </ion-select>
-                </ion-item>
-              </ion-col>
-            </ion-row>
-          </ion-col>
-
-        </ion-row>
+          <ion-item color="primary" lines="none" text-wrap *ngFor="let producto of productos; let i = index">
+            <ion-buttons slot="end">
+              <ion-icon style="font-size: 8vw" name="close-circle" (click)="eliminar(i)" color="light" item-end>
+              </ion-icon>
+              <ion-icon style="font-size: 8vw" name="add-circle" (click)="agregar(i)" color="light" item-end>
+              </ion-icon>
+            </ion-buttons>
+            <ion-text class="text-light">
+              <strong style="font-size:6vw;"> {{producto.cantidad}} </strong> | {{producto.nombre}} <strong>$ {{producto.precio}} c/u</strong>
+            </ion-text>
+          </ion-item>
+          <ion-row>
+            <ion-col size="12">
+              <ion-item>
+                <ion-label>Productos</ion-label>
+                <ion-select [(ngModel)]="productoSeleccionado" interface="alert" multiple="false" placeholder="Elija un producto" (ionChange)="seleccionProducto($event)">
+                  <ion-select-option [value]="producto" *ngFor="let producto of productosDeLaEmpresa">{{producto.nombre}}</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-button expand="block" (click)="seleccionProducto(null, true)">
+                Agregar producto
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-col>
 
 
         <ion-col size="12">
@@ -87,14 +87,15 @@
         <br>
 
 
-        <ion-col size="12" *ngIf="entregasLogic.isScheduled">
-            <ion-item>
+        <ion-col size="12">
+            <ion-item [disabled]="pedido.entregas.out_of_schedule == '1'">
                 <ion-label>
                     Adelanta entregas:
                 </ion-label>
                 <ion-input [(ngModel)]="entregasAdelantadas" type="number">
                 </ion-input>
             </ion-item>
+
 
             <strong>
                 Nota:
