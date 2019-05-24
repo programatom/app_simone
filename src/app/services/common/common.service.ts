@@ -14,7 +14,7 @@ export class CommonService {
     // TEST
 
     var hoy = new Date();
-    hoy.setDate(hoy.getDate() + 98);
+    hoy.setDate(hoy.getDate());
 
     return hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
   }

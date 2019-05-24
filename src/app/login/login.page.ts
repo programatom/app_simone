@@ -11,6 +11,7 @@ export class LoginPage implements OnInit {
 
     email = "";
     password = "";
+    splash = false;
 
     constructor(private auth: AuthService,
         private localStorageServ: LocalStorageService,
