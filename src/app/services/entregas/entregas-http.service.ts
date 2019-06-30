@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from '../http.service';
 import { URL_SERVICES } from 'src/config/config';
+import { map } from "rxjs/operators"
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,12 @@ export class EntregasHttpService {
     "hasta":string
   }){
     let url = URL_SERVICES + "buscarEntregasFecha";
-    return this.http.httpPost(url, data);
+    return this.http.httpPost(url, data).pipe(
+        map((respuesta:any)=>{
+          var respuestaCopy = JSON.parse(JSON.stringify(respuesta));
+          console.log("Copia de la respuesta del servidor: ", respuestaCopy);
+          return respuesta;
+        })
+       );
   }
 }

@@ -26,8 +26,9 @@ export class EntregasLogicService {
     // Variables booleanas
     entregaModificadaYProcesada = false;
     isScheduled = true;
+    isEntregaCreation = false;
 
-    // Navegación
+    // Navegación vars
     modificarPedidoDismissUrl = "";
     infoPedidoDismissUrl = "";
 
@@ -129,6 +130,7 @@ export class EntregasLogicService {
             peticion.data.reintentar = reintentar;
             peticion.data.estado = "sin procesar";
             peticion.data.observaciones = observaciones;
+            console.log("Enviado a reintentar o derivar: ", peticion)
             this.entregasHttp.procesarEntrega(peticion).subscribe((respuesta) => {
                 console.log(respuesta);
                 resolve(respuesta);
@@ -146,13 +148,15 @@ export class EntregasLogicService {
             }else{
               peticion.entrega_id = pedido.entregas.id;
             }
+
             peticion.data = new Object() as DataProcesamiento;
             peticion.data.derivada = 0;
             peticion.data.reintentar = 0;
             peticion.data.estado = estado;
             peticion.data.observaciones = observaciones;
             peticion.data.entregas_adelantadas = entregas_adelantadas;
-            console.log(entregas_adelantadas)
+             
+
             if (entregas_adelantadas > 0) {
               peticion.data.observaciones = peticion.data.observaciones +  ". Mensaje del sistema: entrega adelanta " + entregas_adelantadas + " entregas";
                 peticion.data.adelanta = 1;
@@ -170,9 +174,7 @@ export class EntregasLogicService {
 
             peticion.data.productos_entregados = productosEntregados;
 
-            console.log("SE ENVÍA LA PETICÓN: ", peticion);
-
-
+            console.log("SE ENVÍA LA PETICIÓN: ", peticion);
 
             this.entregasHttp.procesarEntrega(peticion).subscribe((respuesta) => {
                 if(respuesta.status == "fail"){
@@ -216,19 +218,20 @@ export class EntregasLogicService {
               console.log(pedido.id)
               console.log("Entrega id:")
               console.log(entrega.id)
-              console.log(reintentar.includes(entrega.reintentar));
-              console.log(derivada.includes(entrega.derivada))
-              console.log(estado.includes(entrega.estado))
-              console.log(repartidor_excepcional.includes(pedido.repartidor_excepcional_id));
-              console.log(alarma.includes(pedido.alarma));
-              console.log(danger.includes(pedido.danger));
+              console.log("Reintentar filter: " + reintentar.includes(parseInt(entrega.reintentar)));
+              console.log("Derivada filter: " + derivada.includes(parseInt(entrega.derivada)))
+              console.log("Estado filter: " + estado.includes(entrega.estado))
+              console.log("R. excep filter: " + repartidor_excepcional.includes(pedido.repartidor_excepcional_id));
+              console.log("Alarma filter: " + alarma.includes(parseInt(pedido.alarma)));
+              console.log("Danger filter: " + danger.includes(parseInt(pedido.danger)));
               console.log("------")
-              if (reintentar.includes(entrega.reintentar)
-              && derivada.includes(entrega.derivada)
+              if (
+              reintentar.includes(parseInt(entrega.reintentar))
+              && derivada.includes(parseInt(entrega.derivada))
               && estado.includes(entrega.estado)
               && repartidor_excepcional.includes(pedido.repartidor_excepcional_id)
-              && alarma.includes(pedido.alarma)
-              && danger.includes(pedido.danger)
+              && alarma.includes(parseInt(pedido.alarma))
+              && danger.includes(parseInt(pedido.danger))
             ) {
               console.log("Se encontró una entrega congruente: " , JSON.parse(JSON.stringify(entrega)));
               entregas_a_mostrar.push(entrega);

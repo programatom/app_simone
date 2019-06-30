@@ -40,9 +40,10 @@ export class ModificarPedidoPage implements OnInit {
   ionViewWillEnter(){
     this.pedido = this.entregasLogic.pedidoSeleccionado;
     this.productosDeLaEmpresa = this.entregasLogic.productos;
-
-    if(this.pedido.entregas.out_of_schedule == 0){
+    if(!this.entregasLogic.isEntregaCreation){
       this.scheduledLogic();
+    }else{
+      this.entregasLogic.isEntregaCreation = false;
     }
   }
 

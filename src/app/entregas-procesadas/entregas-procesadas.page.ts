@@ -19,6 +19,7 @@ export class EntregasProcesadasPage implements OnInit {
   pedidosDisplay = [];
 
   isHoyScreen = true;
+  hastafilter;
 
   constructor(private entregasHttp: EntregasHttpService,
               private entregasLogic: EntregasLogicService,
@@ -27,7 +28,6 @@ export class EntregasProcesadasPage implements OnInit {
               private toastServ: ToastService,
               private router: Router) {
                 this.routeEvent(this.router);
-
               }
 
   routeEvent(router: Router){
@@ -63,6 +63,9 @@ export class EntregasProcesadasPage implements OnInit {
     //this.fechaHasta = hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
     this.fechaHasta = this.hoy;
     this.inicializarEntregasConReintentarYProcesadasHoy().then(()=>{
+      console.log(this.hastafilter);
+      this.hastafilter = this.hoy;
+
       return;
     });
   }
@@ -149,6 +152,7 @@ export class EntregasProcesadasPage implements OnInit {
  }
 
  entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
+   this.entregasLogic.previousDisplayObjArray.has_to_eliminate = false;
    this.linkPedidoWithOneEntrega(pedido, index_entrega);
    this.entregasLogic.entregarSinModificaciones(pedido).then(()=>{
      this.pedidosDisplay[index_pedido].entregas.splice(index_entrega, 1);

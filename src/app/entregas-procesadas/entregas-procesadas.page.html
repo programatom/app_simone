@@ -15,7 +15,7 @@
 
     <ion-item>
         <ion-label>Hasta</ion-label>
-        <ion-datetime display-format="YYYY/MM/DD" cancelText="Cancelar" doneText="Elegir" (ionChange)="elegirFecha($event, 'hasta')"></ion-datetime>
+        <ion-datetime (value) = "hoy" display-format="YYYY/MM/DD" cancelText="Cancelar" doneText="Elegir" (ionChange)="elegirFecha($event, 'hasta')"></ion-datetime>
     </ion-item>
 
     <ion-button expand="block" (click)="buscarEntregasDistintasAHoy()">Buscar entregas</ion-button>

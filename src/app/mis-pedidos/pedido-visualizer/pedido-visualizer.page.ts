@@ -25,7 +25,8 @@ export class PedidoVisualizerPage implements OnInit {
   nuevaEntrega(){
     this.entregasLogic.pedidoSeleccionado = this.pedido;
     this.entregasLogic.isScheduled = false;
-    this.entregasLogic.modificarPedidoDismissUrl = "/pedido-visualizer"
+    this.entregasLogic.isEntregaCreation = true;
+    this.entregasLogic.modificarPedidoDismissUrl = "/pedido-visualizer";
     this.navCtrl.navigateForward("/modificar-pedido");
   }
 

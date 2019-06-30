@@ -124,7 +124,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
         text:"Aceptar",
         handler:()=>{
           this.entregasLogic.linkPedidoWithOneEntrega(pedido,index_entrega);
-
+          
           this.entregasLogic.entregaAReintentarODerivar(this.entregasLogic.pedidoSeleccionado,0,1,"").then((respuesta)=>{
             this.pedidosDisplay[index_pedido].entregas.splice(index_entrega, 1);
           });
@@ -138,6 +138,7 @@ export class EntregasHabitualesHoyPage implements OnInit {
 
 
   entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
+    this.entregasLogic.previousDisplayObjArray.has_to_eliminate = false;
     this.entregasLogic.entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, this.pedidosDisplay)
                       .then(()=>{
                       });
