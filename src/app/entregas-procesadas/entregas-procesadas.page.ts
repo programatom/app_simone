@@ -57,15 +57,7 @@ export class EntregasProcesadasPage implements OnInit {
   }
 
   async buscarFechaDeHoyYInicializarPantalla(){
-    this.fechaDesde = this.commonServ.hoy();
-    this.hoy = this.fechaDesde;
-    //hoy.setDate(hoy.getDate() + 1);
-    //this.fechaHasta = hoy.getFullYear() + "/" + this.addCeroToNumber(hoy.getMonth() + 1) + "/" + this.addCeroToNumber(hoy.getDate());
-    this.fechaHasta = this.hoy;
     this.inicializarEntregasConReintentarYProcesadasHoy().then(()=>{
-      console.log(this.hastafilter);
-      this.hastafilter = this.hoy;
-
       return;
     });
   }
@@ -74,7 +66,7 @@ export class EntregasProcesadasPage implements OnInit {
     this.pedidosDisplay = [];
     this.pedidosTotales = [];
     return new Promise((resolve)=>{
-      this.buscarPedidos().then((pedidos:Array<any>)=>{
+      this.buscarEntregas(this.commonServ.hoy(), this.commonServ.hoy()).then((pedidos:Array<any>)=>{
         console.log(pedidos);
         pedidos.filter((pedido)=>{
           let entregasPedido = pedido.entregas;
@@ -95,11 +87,6 @@ export class EntregasProcesadasPage implements OnInit {
 
   }
 
-  // HISTORIAL, MUESTRA TODAS LAS ENTREGAS != SIN PROCESAR
-  // HOY, MUESTRA TODAS LAS ENTREGAS DE HOY A REINTENTAR Y SIN PROCESAR
-
-
-
   elegirFecha(event, tipo){
     console.log(event)
     let fecha:string = event.detail.value;
@@ -118,12 +105,13 @@ export class EntregasProcesadasPage implements OnInit {
     }
  }
 
- buscarPedidos(){
+ buscarEntregas(desde, hasta){
    return new Promise((resolve)=>{
      let data = {
-       "desde": this.fechaDesde,
-       "hasta": this.fechaHasta
+       "desde": desde,
+       "hasta": hasta
      }
+     console.log("Data enviada a busqueda filtrando fechas: ", data)
      this.entregasHttp.getEntregasDateFilter(data).subscribe((respuesta)=>{
        console.log(respuesta)
        resolve(respuesta.data);
@@ -133,7 +121,7 @@ export class EntregasProcesadasPage implements OnInit {
 
  buscarEntregasDistintasAHoy(){
    this.isHoyScreen = false;
-   this.buscarPedidos().then((pedidos:any)=>{
+   this.buscarEntregas(this.fechaDesde, this.fechaHasta).then((pedidos:any)=>{
      pedidos = this.entregasLogic.filtrarEntregas(pedidos, [0,1], [0,1], ["cancelada", "entregada"]);
      if(pedidos.length > 20){
        this.pedidosTotales = pedidos.splice(0, 20)
@@ -188,7 +176,7 @@ export class EntregasProcesadasPage implements OnInit {
 
    this.entregasLogic.previousDisplayObjArray.has_to_eliminate = false;
 
-   this.entregasLogic.modificarEntrega(pedido, index_pedido);
+   this.entregasLogic.modificarEntrega(pedido, index_entrega);
  }
 
  ionViewWillEnter(){

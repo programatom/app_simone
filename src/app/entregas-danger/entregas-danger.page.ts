@@ -70,7 +70,7 @@ export class EntregasDangerPage implements OnInit {
     this.entregasLogic.previousDisplayObjArray.index_pedido = index_pedido;
     this.entregasLogic.previousDisplayObjArray.index_pedido = index_entrega;
     this.entregasLogic.previousDisplayObjArray.array = this.pedidosDisplay;
-    this.entregasLogic.modificarEntrega(pedido, index_pedido);
+    this.entregasLogic.modificarEntrega(pedido, index_entrega);
   }
 
 }
