@@ -62,6 +62,7 @@ export class AlarmaDerivadasPage implements OnInit {
   }
 
   entregarSinModificaciones(pedido:ObjEntrega, index_pedido, index_entrega){
+    this.entregasLogic.previousDisplayObjArray.has_to_eliminate = false;
     this.entregasLogic.entregasSinModifYSpliceLista(pedido, index_pedido, index_entrega, this.pedidosDisplay)
                       .then(()=>{
 

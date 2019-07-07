@@ -37,6 +37,14 @@ export class EntregasHabitualesHoyPage implements OnInit {
         }
       });
     }
+
+
+  async refresh(event){
+   await this.buscarEntregasDeHoyYfiltrar();
+   event.target.complete();
+  }
+
+
   ngOnInit() {
     this.buscarEntregasDeHoyYfiltrar();
     this.actualizarEInstanciarProductos();
@@ -92,12 +100,15 @@ export class EntregasHabitualesHoyPage implements OnInit {
   }
 
   buscarEntregasDeHoyYfiltrar(){
-    this.entregasHttp.getEntregasHabitualesHoy().subscribe((pedidos)=>{
-      console.log(pedidos);
-      let pedidosSinProcesarHoy = this.entregasLogic.filtrarEntregas(pedidos.data, [0], [0], ["sin procesar"]);
-      this.pedidosTotales = JSON.parse(JSON.stringify(pedidosSinProcesarHoy));
-      this.pedidosDisplay = JSON.parse(JSON.stringify(pedidosSinProcesarHoy));
-    });
+    return new Promise((resolve)=>{
+      this.entregasHttp.getEntregasHabitualesHoy().subscribe((pedidos)=>{
+        console.log("Copia de la respuesta de las entregas habituales de hoy: ",JSON.parse(JSON.stringify(pedidos)));
+        let pedidosSinProcesarHoy = this.entregasLogic.filtrarEntregas(pedidos.data, [0], [0], ["sin procesar"]);
+        this.pedidosTotales = JSON.parse(JSON.stringify(pedidosSinProcesarHoy));
+        this.pedidosDisplay = JSON.parse(JSON.stringify(pedidosSinProcesarHoy));
+        resolve();
+      });
+    });  
   }
 
   buscarEntrega(event){
